@@ -38,8 +38,8 @@ OMNIX-Shield solves this with **Prompt Surgery**: it moves the agent's personali
 
 ```bash
 # Clone
-git clone https://github.com/YOUR_USERNAME/omnix-shield.git
-cd omnix-shield
+git clone https://github.com/bieeins/ag-shield-onix.git
+cd ag-shield-onix
 
 # Run (zero dependencies — Node.js only)
 node index.js
