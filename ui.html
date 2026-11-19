@@ -1,0 +1,1386 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>OMNIX-Shield | Agentic AI Sanitizer Proxy (AG-Shield + OMNIX v10)</title>
+  <style>
+    :root {
+      --bg: #090d16;
+      --card-bg: rgba(18, 24, 38, 0.72);
+      --card-border: rgba(255, 255, 255, 0.08);
+      --card-hover: rgba(28, 36, 56, 0.85);
+      --accent: #3b82f6;
+      --accent-glow: rgba(59, 130, 246, 0.25);
+      --success: #10b981;
+      --success-glow: rgba(16, 185, 129, 0.25);
+      --warning: #f59e0b;
+      --danger: #ef4444;
+      --purple: #8b5cf6;
+      --text-main: #f1f5f9;
+      --text-muted: #94a3b8;
+      --text-sub: #64748b;
+      --font: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+      --mono: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", monospace;
+    }
+
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body {
+      background: var(--bg);
+      background-image: 
+        radial-gradient(at 0% 0%, rgba(59, 130, 246, 0.12) 0px, transparent 50%),
+        radial-gradient(at 100% 100%, rgba(139, 92, 246, 0.10) 0px, transparent 50%);
+      color: var(--text-main);
+      font-family: var(--font);
+      min-height: 100vh;
+      padding: 24px;
+      line-height: 1.5;
+    }
+
+    .container { max-width: 1200px; margin: 0 auto; }
+
+    /* Header */
+    header {
+      display: flex;
+      flex-wrap: wrap;
+      align-items: center;
+      justify-content: space-between;
+      gap: 16px;
+      padding: 16px 24px;
+      background: var(--card-bg);
+      border: 1px solid var(--card-border);
+      border-radius: 16px;
+      backdrop-filter: blur(16px);
+      box-shadow: 0 8px 32px rgba(0, 0, 0, 0.35);
+      margin-bottom: 24px;
+    }
+
+    .brand {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+    }
+    .brand-icon {
+      width: 40px;
+      height: 40px;
+      background: linear-gradient(135deg, #2563eb, #7c3aed);
+      border-radius: 10px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      box-shadow: 0 4px 14px var(--accent-glow);
+    }
+    .brand-icon svg { width: 22px; height: 22px; fill: white; }
+    .brand-title {
+      font-size: 1.35rem;
+      font-weight: 700;
+      letter-spacing: 0.5px;
+      background: linear-gradient(135deg, #ffffff, #93c5fd);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+    }
+    .brand-sub { font-size: 0.75rem; color: var(--text-muted); }
+
+    .header-pills {
+      display: flex;
+      align-items: center;
+      flex-wrap: wrap;
+      gap: 10px;
+    }
+
+    .pill {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      padding: 6px 14px;
+      background: rgba(255, 255, 255, 0.04);
+      border: 1px solid var(--card-border);
+      border-radius: 20px;
+      font-size: 0.8rem;
+      color: var(--text-muted);
+    }
+    .pill-active {
+      border-color: rgba(16, 185, 129, 0.3);
+      color: #34d399;
+      background: rgba(16, 185, 129, 0.08);
+    }
+    .pulse-dot {
+      width: 8px;
+      height: 8px;
+      background: var(--success);
+      border-radius: 50%;
+      box-shadow: 0 0 8px var(--success);
+      animation: pulse 2s infinite;
+    }
+    @keyframes pulse {
+      0%, 100% { opacity: 1; transform: scale(1); }
+      50% { opacity: 0.4; transform: scale(0.85); }
+    }
+
+    .btn-copy {
+      background: rgba(59, 130, 246, 0.15);
+      border: 1px solid rgba(59, 130, 246, 0.4);
+      color: #93c5fd;
+      padding: 6px 12px;
+      border-radius: 8px;
+      cursor: pointer;
+      font-size: 0.78rem;
+      font-family: var(--mono);
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      transition: all 0.2s;
+    }
+    .btn-copy:hover {
+      background: rgba(59, 130, 246, 0.3);
+      color: #fff;
+    }
+
+    /* KPI Grid */
+    .kpi-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+      gap: 16px;
+      margin-bottom: 24px;
+    }
+    .kpi-card {
+      background: var(--card-bg);
+      border: 1px solid var(--card-border);
+      border-radius: 14px;
+      padding: 20px;
+      backdrop-filter: blur(12px);
+      box-shadow: 0 4px 20px rgba(0, 0, 0, 0.2);
+      transition: transform 0.2s, border-color 0.2s;
+    }
+    .kpi-card:hover {
+      transform: translateY(-2px);
+      border-color: rgba(255, 255, 255, 0.15);
+    }
+    .kpi-label { font-size: 0.8rem; text-transform: uppercase; letter-spacing: 0.5px; color: var(--text-muted); margin-bottom: 6px; }
+    .kpi-value { font-size: 2rem; font-weight: 700; color: var(--text-main); font-family: var(--mono); }
+    .kpi-sub { font-size: 0.75rem; color: var(--text-sub); margin-top: 4px; }
+    .kpi-accent-blue { border-left: 4px solid var(--accent); }
+    .kpi-accent-green { border-left: 4px solid var(--success); }
+    .kpi-accent-purple { border-left: 4px solid var(--purple); }
+    .kpi-accent-red { border-left: 4px solid var(--danger); }
+
+    /* Control Panel Layout */
+    .controls-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 20px;
+      margin-bottom: 24px;
+    }
+    @media (max-width: 860px) {
+      .controls-grid { grid-template-columns: 1fr; }
+    }
+
+    .panel-card {
+      background: var(--card-bg);
+      border: 1px solid var(--card-border);
+      border-radius: 14px;
+      padding: 20px;
+      backdrop-filter: blur(12px);
+    }
+    .panel-title {
+      font-size: 1rem;
+      font-weight: 600;
+      color: var(--text-main);
+      margin-bottom: 16px;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    /* Sub-panel rule config */
+    .btn-gear {
+      background: rgba(255, 255, 255, 0.05);
+      border: 1px solid var(--card-border);
+      color: var(--text-muted);
+      padding: 4px 8px;
+      border-radius: 6px;
+      font-size: 0.72rem;
+      cursor: pointer;
+      display: inline-flex;
+      align-items: center;
+      gap: 4px;
+      transition: all 0.2s;
+    }
+    .btn-gear:hover {
+      background: rgba(59, 130, 246, 0.15);
+      border-color: rgba(59, 130, 246, 0.4);
+      color: #93c5fd;
+    }
+    .sub-panel {
+      display: none;
+      background: rgba(0, 0, 0, 0.35);
+      border: 1px solid rgba(255, 255, 255, 0.06);
+      border-radius: 10px;
+      padding: 12px 14px;
+      margin-top: 10px;
+      margin-bottom: 6px;
+    }
+    .sub-panel.active { display: block; animation: fadeIn 0.2s ease-in-out; }
+    @keyframes fadeIn { from { opacity: 0; transform: translateY(-4px); } to { opacity: 1; transform: translateY(0); } }
+    .check-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; margin: 8px 0; }
+    .check-label { display: flex; align-items: center; gap: 6px; font-size: 0.76rem; color: var(--text-muted); cursor: pointer; }
+    .check-label input { accent-color: var(--accent); }
+    .btn-save-sub {
+      background: rgba(59, 130, 246, 0.2);
+      border: 1px solid rgba(59, 130, 246, 0.4);
+      color: #93c5fd;
+      padding: 5px 12px;
+      border-radius: 6px;
+      font-size: 0.74rem;
+      cursor: pointer;
+      margin-top: 8px;
+    }
+    .btn-save-sub:hover { background: rgba(59, 130, 246, 0.35); color: #fff; }
+
+    /* Switch list */
+    .switch-list { display: flex; flex-direction: column; gap: 14px; }
+    .switch-row {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 12px;
+      padding-bottom: 12px;
+      border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+    }
+    .switch-row:last-child { border-bottom: none; padding-bottom: 0; }
+    .switch-info { flex: 1; }
+    .switch-name { font-size: 0.88rem; font-weight: 500; color: var(--text-main); }
+    .switch-desc { font-size: 0.74rem; color: var(--text-muted); }
+
+    /* Toggle switch */
+    .toggle {
+      position: relative;
+      display: inline-block;
+      width: 44px;
+      height: 24px;
+      flex-shrink: 0;
+    }
+    .toggle input { opacity: 0; width: 0; height: 0; }
+    .slider {
+      position: absolute;
+      cursor: pointer;
+      top: 0; left: 0; right: 0; bottom: 0;
+      background-color: #334155;
+      transition: .25s;
+      border-radius: 24px;
+    }
+    .slider:before {
+      position: absolute;
+      content: "";
+      height: 18px;
+      width: 18px;
+      left: 3px;
+      bottom: 3px;
+      background-color: white;
+      transition: .25s;
+      border-radius: 50%;
+    }
+    input:checked + .slider { background-color: var(--accent); }
+    input:checked + .slider:before { transform: translateX(20px); }
+
+    /* Forms */
+    .form-group { margin-bottom: 12px; }
+    .form-label { display: block; font-size: 0.78rem; color: var(--text-muted); margin-bottom: 6px; }
+    .form-input, .form-select {
+      width: 100%;
+      background: rgba(0, 0, 0, 0.35);
+      border: 1px solid var(--card-border);
+      border-radius: 8px;
+      padding: 8px 12px;
+      color: var(--text-main);
+      font-size: 0.88rem;
+      font-family: var(--mono);
+      outline: none;
+      transition: border-color 0.2s;
+    }
+    .form-input:focus, .form-select:focus { border-color: var(--accent); }
+    .form-select option { background: #0f172a; color: #fff; }
+
+    .btn-primary {
+      background: linear-gradient(135deg, #2563eb, #3b82f6);
+      border: none;
+      color: white;
+      padding: 10px 18px;
+      border-radius: 8px;
+      font-size: 0.85rem;
+      font-weight: 600;
+      cursor: pointer;
+      width: 100%;
+      transition: opacity 0.2s;
+    }
+    .btn-primary:hover { opacity: 0.9; }
+
+    .btn-test {
+      background: rgba(16, 185, 129, 0.15);
+      border: 1px solid rgba(16, 185, 129, 0.35);
+      color: #34d399;
+      padding: 8px 14px;
+      border-radius: 8px;
+      font-size: 0.8rem;
+      font-weight: 600;
+      cursor: pointer;
+      transition: all 0.2s;
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+    }
+    .btn-test:hover { background: rgba(16, 185, 129, 0.25); color: #fff; }
+
+    /* Custom replacements */
+    .rep-container { margin-top: 14px; }
+    .rep-list { max-height: 120px; overflow-y: auto; display: flex; flex-direction: column; gap: 6px; margin-bottom: 10px; }
+    .rep-item {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      background: rgba(0, 0, 0, 0.25);
+      border: 1px solid var(--card-border);
+      padding: 6px 10px;
+      border-radius: 6px;
+      font-size: 0.76rem;
+      font-family: var(--mono);
+    }
+    .rep-item span { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; max-width: 80%; }
+    .rep-del { color: var(--danger); background: none; border: none; cursor: pointer; font-size: 0.85rem; padding: 2px 6px; }
+    .rep-add-row { display: grid; grid-template-columns: 1fr 1fr auto; gap: 6px; }
+    .btn-add {
+      background: rgba(255, 255, 255, 0.08);
+      border: 1px solid var(--card-border);
+      color: var(--text-main);
+      padding: 6px 12px;
+      border-radius: 6px;
+      cursor: pointer;
+      font-size: 0.78rem;
+    }
+    .btn-add:hover { background: rgba(255, 255, 255, 0.15); }
+
+    /* Live Traffic Feed */
+    .traffic-card {
+      background: var(--card-bg);
+      border: 1px solid var(--card-border);
+      border-radius: 14px;
+      padding: 20px;
+      backdrop-filter: blur(12px);
+    }
+    .traffic-header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      margin-bottom: 14px;
+    }
+    .btn-secondary {
+      background: rgba(255, 255, 255, 0.06);
+      border: 1px solid var(--card-border);
+      color: var(--text-muted);
+      padding: 6px 12px;
+      border-radius: 8px;
+      font-size: 0.75rem;
+      cursor: pointer;
+      transition: all 0.2s;
+    }
+    .btn-secondary:hover { background: rgba(255, 255, 255, 0.12); color: var(--text-main); }
+
+    .table-container {
+      overflow-x: auto;
+      max-height: 480px;
+      overflow-y: auto;
+      border-radius: 8px;
+      border: 1px solid rgba(255, 255, 255, 0.04);
+    }
+    table { width: 100%; border-collapse: collapse; font-size: 0.8rem; text-align: left; }
+    th {
+      background: rgba(15, 23, 42, 0.8);
+      color: var(--text-muted);
+      font-weight: 600;
+      padding: 10px 14px;
+      position: sticky;
+      top: 0;
+      z-index: 2;
+      border-bottom: 1px solid var(--card-border);
+    }
+    td {
+      padding: 10px 14px;
+      border-bottom: 1px solid rgba(255, 255, 255, 0.04);
+      color: var(--text-main);
+    }
+    tr:hover { background: rgba(255, 255, 255, 0.02); }
+
+    .badge {
+      display: inline-block;
+      padding: 2px 8px;
+      border-radius: 4px;
+      font-size: 0.72rem;
+      font-weight: 600;
+      font-family: var(--mono);
+    }
+    .badge-200 { background: rgba(16, 185, 129, 0.15); color: #34d399; border: 1px solid rgba(16, 185, 129, 0.3); }
+    .badge-local { background: rgba(139, 92, 246, 0.15); color: #c084fc; border: 1px solid rgba(139, 92, 246, 0.3); }
+    .badge-warn { background: rgba(245, 158, 11, 0.15); color: #fbbf24; border: 1px solid rgba(245, 158, 11, 0.3); }
+    .badge-err { background: rgba(239, 68, 68, 0.15); color: #f87171; border: 1px solid rgba(239, 68, 68, 0.3); }
+
+    .tag-sanitized {
+      background: rgba(59, 130, 246, 0.12);
+      color: #60a5fa;
+      padding: 1px 6px;
+      border-radius: 4px;
+      font-size: 0.68rem;
+      margin-left: 6px;
+    }
+
+    /* Modal / Inspector Drawer */
+    .drawer-overlay {
+      position: fixed;
+      top: 0; left: 0; right: 0; bottom: 0;
+      background: rgba(0, 0, 0, 0.7);
+      backdrop-filter: blur(4px);
+      display: none;
+      align-items: center;
+      justify-content: center;
+      z-index: 100;
+      padding: 20px;
+    }
+    .drawer-overlay.active { display: flex; }
+    .drawer-box {
+      background: #0f172a;
+      border: 1px solid var(--card-border);
+      border-radius: 16px;
+      width: 100%;
+      max-width: 720px;
+      max-height: 85vh;
+      display: flex;
+      flex-direction: column;
+      box-shadow: 0 16px 40px rgba(0, 0, 0, 0.5);
+    }
+    .drawer-header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 16px 20px;
+      border-bottom: 1px solid var(--card-border);
+    }
+    .drawer-body {
+      padding: 20px;
+      overflow-y: auto;
+      font-family: var(--mono);
+      font-size: 0.78rem;
+      color: #cbd5e1;
+      white-space: pre-wrap;
+      word-break: break-all;
+    }
+    .close-btn { background: none; border: none; color: var(--text-muted); font-size: 1.2rem; cursor: pointer; }
+    .close-btn:hover { color: #fff; }
+
+    /* Toast */
+    .toast {
+      position: fixed;
+      bottom: 24px;
+      right: 24px;
+      background: #1e293b;
+      border: 1px solid var(--accent);
+      color: #fff;
+      padding: 10px 18px;
+      border-radius: 8px;
+      font-size: 0.8rem;
+      box-shadow: 0 4px 16px rgba(0, 0, 0, 0.4);
+      transform: translateY(100px);
+      opacity: 0;
+      transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+      z-index: 200;
+    }
+    .toast.show { transform: translateY(0); opacity: 1; }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <!-- Header -->
+    <header>
+      <div class="brand">
+        <div class="brand-icon">
+          <svg viewBox="0 0 24 24"><path d="M12 2L4 5v6.09c0 5.05 3.41 9.76 8 10.91 4.59-1.15 8-5.86 8-10.91V5l-8-3zm1 14h-2v-2h2v2zm0-4h-2V7h2v5z"/></svg>
+        </div>
+        <div>
+          <div class="brand-title">AG-SHIELD</div>
+          <div class="brand-sub">Agentic AI Sanitizer Proxy (AG-Shield + OMNIX v10)</div>
+        </div>
+      </div>
+      <div class="header-pills">
+        <div class="pill pill-active">
+          <span class="pulse-dot"></span>
+          <span>ONLINE</span>
+        </div>
+        <div class="pill" id="version-pill" onclick="checkUpdatesManual()" style="cursor:pointer;" title="Click to check updates">v1.0.0</div>
+        <div id="update-banner" style="display:none; align-items:center; gap:6px;">
+          <span class="pill" style="border-color:rgba(245,158,11,0.4); background:rgba(245,158,11,0.12); color:#fbbf24;">
+            ⚡ Update <span id="latest-ver-text">v1.0.1</span>
+          </span>
+          <button class="btn-copy" onclick="triggerWebUpdate()" style="background:rgba(245,158,11,0.2); border-color:rgba(245,158,11,0.5); color:#fde68a;">
+            Update Now
+          </button>
+          <button class="btn-copy" onclick="copyUpdateCmd()" title="Copy CLI update command">
+            📋 Copy Cmd
+          </button>
+        </div>
+        <div class="pill" id="autostart-pill">Boot: Checking...</div>
+        <div class="pill" id="target-pill">Target: http://127.0.0.1:20128</div>
+        <button class="btn-copy" id="copy-btn" onclick="copyEndpoint()">
+          <span>Copy Base URL:</span>
+          <strong id="endpoint-text">http://127.0.0.1:20129/v1</strong>
+        </button>
+      </div>
+    </header>
+
+    <!-- 4 KPI Cards -->
+    <div class="kpi-grid">
+      <div class="kpi-card kpi-accent-blue">
+        <div class="kpi-label">Total Requests</div>
+        <div class="kpi-value" id="kpi-total">0</div>
+        <div class="kpi-sub">Proxied & Inspected</div>
+      </div>
+      <div class="kpi-card kpi-accent-green">
+        <div class="kpi-label">Signatures Neutralized</div>
+        <div class="kpi-value" id="kpi-sanitized">0</div>
+        <div class="kpi-sub">Fingerprints Stripped</div>
+      </div>
+      <div class="kpi-card kpi-accent-purple">
+        <div class="kpi-label">RPM Quota Saved</div>
+        <div class="kpi-value" id="kpi-saved">0</div>
+        <div class="kpi-sub">Mocked Local Titles</div>
+      </div>
+      <div class="kpi-card kpi-accent-red">
+        <div class="kpi-label">Upstream Errors</div>
+        <div class="kpi-value" id="kpi-errors">0</div>
+        <div class="kpi-sub">4xx / 5xx / 429 Trapped</div>
+      </div>
+    </div>
+
+    <!-- Controls Panel -->
+    <div class="controls-grid">
+      <!-- Engine Toggles & System Autostart -->
+      <div class="panel-card">
+        <div class="panel-title">
+          <svg style="width:18px;height:18px;fill:var(--accent)" viewBox="0 0 24 24"><path d="M19.14 12.94c.04-.3.06-.61.06-.94 0-.32-.02-.64-.07-.94l2.03-1.58c.18-.14.23-.41.12-.61l-1.92-3.32c-.12-.22-.37-.29-.59-.22l-2.39.96c-.5-.38-1.03-.7-1.62-.94l-.36-2.54c-.04-.24-.24-.41-.48-.41h-3.84c-.24 0-.43.17-.47.41l-.36 2.54c-.59.24-1.13.57-1.62.94l-2.39-.96c-.22-.08-.47 0-.59.22L2.74 8.87c-.12.21-.08.47.12.61l2.03 1.58c-.05.3-.09.63-.09.94s.02.64.07.94l-2.03 1.58c-.18.14-.23.41-.12.61l1.92 3.32c.12.22.37.29.59.22l2.39-.96c.5.38 1.03.7 1.62.94l.36 2.54c.05.24.24.41.48.41h3.84c.24 0 .44-.17.47-.41l.36-2.54c.59-.24 1.13-.56 1.62-.94l2.39.96c.22.08.47 0 .59-.22l1.92-3.32c.12-.22.07-.47-.12-.61l-2.01-1.58zM12 15.6c-1.98 0-3.6-1.62-3.6-3.6s1.62-3.6 3.6-3.6 3.6 1.62 3.6 3.6-1.62 3.6-3.6 3.6z"/></svg>
+          Active Sanitization & System Rules
+        </div>
+        <div class="switch-list">
+          <!-- Autostart Boot -->
+          <div class="switch-row" style="background:rgba(59,130,246,0.06); padding:10px; border-radius:8px; border-bottom:none;">
+            <div class="switch-info">
+              <div class="switch-name" style="color:#93c5fd;">🚀 Run on System Boot (Autostart)</div>
+              <div class="switch-desc" id="autostart-desc">Auto-launch silently in background on OS startup</div>
+              <button id="linux-service-btn" class="btn-copy" style="font-size:0.7rem; padding:3px 8px; margin-top:6px; display:inline-flex;" onclick="copyLinuxService()">📋 Linux systemd Command</button>
+            </div>
+            <label class="toggle">
+              <input type="checkbox" id="cfg-autostart" onchange="toggleAutostart()">
+              <span class="slider"></span>
+            </label>
+          </div>
+
+          <!-- 1. Strip Signatures -->
+          <div>
+            <div class="switch-row">
+              <div class="switch-info">
+                <div class="switch-name">Strip Agent Signatures</div>
+                <div class="switch-desc">Neutralize Hermes, OpenClaw, Cline identity & environment fingerprints</div>
+              </div>
+              <div style="display:flex; align-items:center; gap:8px;">
+                <button class="btn-gear" onclick="toggleSubPanel('panel-signatures')">⚙️ Rules</button>
+                <label class="toggle">
+                  <input type="checkbox" id="cfg-promptSurgery" onchange="updateToggle('promptSurgery')">
+                  <span class="slider"></span>
+                </label>
+              </div>
+            </div>
+            <div class="sub-panel" id="panel-signatures">
+              <div class="form-group">
+                <label class="form-label">Assistant Name</label>
+                <input type="text" class="form-input" id="cfg-assistantName" placeholder="OMNIX Assistant"
+                  onchange="updateText('assistantName')">
+                <small style="color:var(--text-sub)">Name injected into soul/identity (replaces agent name)</small>
+              </div>
+              <div class="form-group">
+                <label class="form-label">Assistant Maker</label>
+                <input type="text" class="form-input" id="cfg-assistantMaker" placeholder="the development team"
+                  onchange="updateText('assistantMaker')">
+              </div>
+              <hr style="border-color:var(--card-border);margin:12px 0">
+              <label class="form-label" style="margin-bottom:8px">Sections to Preserve (moved to user message to bypass detection)</label>
+              <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px">
+                <label style="display:flex;align-items:center;gap:6px;cursor:pointer;font-size:0.85rem;color:var(--text-muted)"><input type="checkbox" id="cfg-preserveSoul" onchange="updateToggle('preserveSoul')" style="width:16px;height:16px;accent-color:var(--accent)"><span>Soul / Identity</span></label>
+                <label style="display:flex;align-items:center;gap:6px;cursor:pointer;font-size:0.85rem;color:var(--text-muted)"><input type="checkbox" id="cfg-preserveMemory" onchange="updateToggle('preserveMemory')" style="width:16px;height:16px;accent-color:var(--accent)"><span>Memory</span></label>
+                <label style="display:flex;align-items:center;gap:6px;cursor:pointer;font-size:0.85rem;color:var(--text-muted)"><input type="checkbox" id="cfg-preserveSkills" onchange="updateToggle('preserveSkills')" style="width:16px;height:16px;accent-color:var(--accent)"><span>Skills List</span></label>
+                <label style="display:flex;align-items:center;gap:6px;cursor:pointer;font-size:0.85rem;color:var(--text-muted)"><input type="checkbox" id="cfg-preserveProfile" onchange="updateToggle('preserveProfile')" style="width:16px;height:16px;accent-color:var(--accent)"><span>Profile</span></label>
+                <label style="display:flex;align-items:center;gap:6px;cursor:pointer;font-size:0.85rem;color:var(--text-muted)"><input type="checkbox" id="cfg-preserveCliNote" onchange="updateToggle('preserveCliNote')" style="width:16px;height:16px;accent-color:var(--accent)"><span>CLI/Desktop Note</span></label>
+                <label style="display:flex;align-items:center;gap:6px;cursor:pointer;font-size:0.85rem;color:var(--text-muted)"><input type="checkbox" id="cfg-preserveEnvironment" onchange="updateToggle('preserveEnvironment')" style="width:16px;height:16px;accent-color:var(--accent)"><span>Environment</span></label>
+              </div>
+            </div>
+          </div>
+
+          <!-- 2. Tool Schemas -->
+          <div>
+            <div class="switch-row">
+              <div class="switch-info">
+                <div class="switch-name">Simplify Tool Schemas</div>
+                <div class="switch-desc">Collapse nested anyOf, strip strict:true and unsupported JSON schema rules</div>
+              </div>
+              <div style="display:flex; align-items:center; gap:8px;">
+                <button class="btn-gear" onclick="toggleSubPanel('panel-tools')">⚙️ Rules</button>
+                <label class="toggle">
+                  <input type="checkbox" id="cfg-simplifyToolSchemas" onchange="updateToggle('simplifyToolSchemas')">
+                  <span class="slider"></span>
+                </label>
+              </div>
+            </div>
+            <div class="sub-panel" id="panel-tools">
+              <div class="form-label">Select Schema Cleanup Rules:</div>
+              <div class="check-grid">
+                <label class="check-label"><input type="checkbox" id="cfg-stripStrict" onchange="updateToolRule('stripStrict')"> Strip strict: true</label>
+                <label class="check-label"><input type="checkbox" id="cfg-stripSchemaUrl" onchange="updateToolRule('stripSchemaUrl')"> Strip $schema URL</label>
+                <label class="check-label"><input type="checkbox" id="cfg-stripAdditionalProperties" onchange="updateToolRule('stripAdditionalProperties')"> Strip additionalProperties</label>
+                <label class="check-label"><input type="checkbox" id="cfg-collapseAnyOf" onchange="updateToolRule('collapseAnyOf')"> Collapse anyOf / oneOf</label>
+                <label class="check-label" style="grid-column: span 2;"><input type="checkbox" id="cfg-stripValidationBounds" onchange="updateToolRule('stripValidationBounds')"> Strip min/max bounds (minItems, maxItems, minLength)</label>
+              </div>
+            </div>
+          </div>
+
+          <!-- 3. Reasoning Effort -->
+          <div>
+            <div class="switch-row">
+              <div class="switch-info">
+                <div class="switch-name">Fix reasoning_effort: "none"</div>
+                <div class="switch-desc">Map "none" to "low" to prevent 400 INVALID_ARGUMENT on Gemini / OpenAI</div>
+              </div>
+              <div style="display:flex; align-items:center; gap:8px;">
+                <button class="btn-gear" onclick="toggleSubPanel('panel-reasoning')">⚙️ Rules</button>
+                <label class="toggle">
+                  <input type="checkbox" id="cfg-fixReasoningEffort" onchange="updateToggle('fixReasoningEffort')">
+                  <span class="slider"></span>
+                </label>
+              </div>
+            </div>
+            <div class="sub-panel" id="panel-reasoning">
+              <div style="display:grid; grid-template-columns: 1fr 1fr; gap:10px;">
+                <div>
+                  <label class="form-label">When reasoning_effort is:</label>
+                  <input type="text" class="form-input" id="cfg-reasoningEffortSource" placeholder="none">
+                </div>
+                <div>
+                  <label class="form-label">Map / Change to:</label>
+                  <select class="form-select" id="cfg-reasoningEffortTarget">
+                    <option value="low">low (Recommended)</option>
+                    <option value="medium">medium</option>
+                    <option value="high">high</option>
+                    <option value="remove">remove (Delete field)</option>
+                  </select>
+                </div>
+              </div>
+              <button class="btn-save-sub" onclick="saveReasoningRules()">Save Reasoning Mapping</button>
+            </div>
+          </div>
+
+          <!-- 4. Local Titles -->
+          <div>
+            <div class="switch-row">
+              <div class="switch-info">
+                <div class="switch-name">Mock Local Titles (Save RPM)</div>
+                <div class="switch-desc">Instantly respond to background session_title prompts without hitting upstream API</div>
+              </div>
+              <div style="display:flex; align-items:center; gap:8px;">
+                <button class="btn-gear" onclick="toggleSubPanel('panel-titles')">⚙️ Rules</button>
+                <label class="toggle">
+                  <input type="checkbox" id="cfg-mockLocalTitles" onchange="updateToggle('mockLocalTitles')">
+                  <span class="slider"></span>
+                </label>
+              </div>
+            </div>
+            <div class="sub-panel" id="panel-titles">
+              <div class="form-group">
+                <label class="form-label">Synthetic Title Content</label>
+                <input type="text" class="form-input" id="cfg-mockTitleText" placeholder="New Session">
+              </div>
+              <div class="form-group">
+                <label class="form-label">Trigger Keywords Regex</label>
+                <input type="text" class="form-input" id="cfg-mockTitleKeywords" placeholder="session\s*title|chat\s*title|...">
+              </div>
+              <button class="btn-save-sub" onclick="saveTitleRules()">Save Title Rules</button>
+            </div>
+          </div>
+
+          <!-- 5. User-Agent Spoofing -->
+          <div>
+            <div class="switch-row">
+              <div class="switch-info">
+                <div class="switch-name">Spoof User-Agent Header</div>
+                <div class="switch-desc">Mask client User-Agent with standard OpenAI SDK header</div>
+              </div>
+              <div style="display:flex; align-items:center; gap:8px;">
+                <button class="btn-gear" onclick="toggleSubPanel('panel-ua')">⚙️ Rules</button>
+                <label class="toggle">
+                  <input type="checkbox" id="cfg-spoofUserAgent" onchange="updateToggle('spoofUserAgent')">
+                  <span class="slider"></span>
+                </label>
+              </div>
+            </div>
+            <div class="sub-panel" id="panel-ua">
+              <div class="form-group">
+                <label class="form-label">Custom User-Agent Header</label>
+                <input type="text" class="form-input" id="cfg-customUserAgent" placeholder="Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36">
+              </div>
+              <div style="display:flex; gap:6px; flex-wrap:wrap; margin-bottom:8px;">
+                <button class="btn-secondary" style="font-size:0.7rem;" onclick="setUAPreset('node')">OpenAI Node SDK</button>
+                <button class="btn-secondary" style="font-size:0.7rem;" onclick="setUAPreset('python')">OpenAI Python SDK</button>
+                <button class="btn-secondary" style="font-size:0.7rem;" onclick="setUAPreset('cursor')">Cursor Client</button>
+                <button class="btn-secondary" style="font-size:0.7rem;" onclick="setUAPreset('curl')">curl/8.4</button>
+              </div>
+              <button class="btn-save-sub" onclick="saveUARules()">Save User-Agent Header</button>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Upstream Main Router Panel -->
+      <div class="panel-card">
+        <div class="panel-title">
+          <svg style="width:18px;height:18px;fill:var(--purple)" viewBox="0 0 24 24"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-1 17.93c-3.95-.49-7-3.85-7-7.93 0-.62.08-1.21.21-1.79L9 15v1c0 1.1.9 2 2 2v1.93zm6.9-2.54c-.26-.81-1-1.39-1.9-1.39h-1v-3c0-.55-.45-1-1-1H8v-2h2c.55 0 1-.45 1-1V7h2c1.1 0 2-.9 2-2v-.41c2.93 1.19 5 4.06 5 7.41 0 2.08-.8 3.97-2.1 5.39z"/></svg>
+          Main Upstream Router (مشخصات روتر اصلی)
+        </div>
+
+        <!-- Router Presets -->
+        <div class="form-group">
+          <label class="form-label">Router Preset</label>
+          <select class="form-select" id="router-preset" onchange="applyPreset()">
+            <option value="9router">9Router / Antigravity (127.0.0.1:20128 HTTP)</option>
+            <option value="litellm">LiteLLM Proxy (127.0.0.1:4000 HTTP)</option>
+            <option value="openrouter">OpenRouter (openrouter.ai:443 HTTPS)</option>
+            <option value="gemini">Google Gemini OpenAI-Compat (generativelanguage.googleapis.com:443 HTTPS)</option>
+            <option value="custom">Custom Upstream Router / Gateway</option>
+          </select>
+        </div>
+
+        <div style="display:grid; grid-template-columns: 1fr 2fr 1fr; gap: 8px; margin-bottom: 10px;">
+          <div>
+            <label class="form-label">Protocol</label>
+            <select class="form-select" id="cfg-targetProtocol">
+              <option value="http">http://</option>
+              <option value="https">https://</option>
+            </select>
+          </div>
+          <div>
+            <label class="form-label">Host / IP</label>
+            <input type="text" class="form-input" id="cfg-targetHost" placeholder="127.0.0.1">
+          </div>
+          <div>
+            <label class="form-label">Port</label>
+            <input type="number" class="form-input" id="cfg-targetPort" placeholder="20128">
+          </div>
+        </div>
+
+        <div style="display:grid; grid-template-columns: 2fr 1fr; gap: 8px; margin-bottom: 12px;">
+          <div>
+            <label class="form-label">Upstream API Key (Optional)</label>
+            <input type="password" class="form-input" id="cfg-targetApiKey" placeholder="Bearer sk-... or leave empty">
+          </div>
+          <div>
+            <label class="form-label">Base Path (Opt)</label>
+            <input type="text" class="form-input" id="cfg-targetBasePath" placeholder="/v1 or /">
+          </div>
+        </div>
+
+        <div style="display:flex; gap: 8px; margin-bottom: 16px;">
+          <button class="btn-primary" onclick="saveTarget()" style="flex:2;">Save Router Settings</button>
+          <button class="btn-test" onclick="testUpstreamConnection()" style="flex:1;">
+            <span>⚡ Test Ping</span>
+          </button>
+        </div>
+        <div id="test-result-box" style="display:none; font-size:0.75rem; font-family:var(--mono); padding:8px 12px; border-radius:6px; margin-bottom:14px;"></div>
+
+        <div class="rep-container">
+          <label class="form-label">Custom Text Replacements</label>
+          <div class="rep-list" id="rep-list"></div>
+          <div class="rep-add-row">
+            <input type="text" class="form-input" id="new-find" placeholder="Find text..." style="font-size:0.75rem;">
+            <input type="text" class="form-input" id="new-replace" placeholder="Replace with..." style="font-size:0.75rem;">
+            <button class="btn-add" onclick="addReplacement()">Add</button>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Live Traffic Feed -->
+    <div class="traffic-card">
+      <div class="traffic-header">
+        <div class="panel-title" style="margin-bottom:0;">
+          <svg style="width:18px;height:18px;fill:var(--success)" viewBox="0 0 24 24"><path d="M3.5 18.49l6-6.01 4 4L22 6.92l-1.41-1.41-7.09 7.97-4-4L2 16.99z"/></svg>
+          Live Traffic Inspector
+        </div>
+        <div style="display:flex; gap:8px;">
+          <button class="btn-secondary" onclick="clearLogs()">Clear History</button>
+        </div>
+      </div>
+
+      <div class="table-container">
+        <table>
+          <thead>
+            <tr>
+              <th>Time</th>
+              <th>Endpoint</th>
+              <th>Model</th>
+              <th>Tools</th>
+              <th>Status</th>
+              <th>Latency</th>
+              <th>Details</th>
+            </tr>
+          </thead>
+          <tbody id="traffic-body">
+            <tr>
+              <td colspan="7" style="text-align:center; color:var(--text-sub); padding:30px;">
+                Waiting for incoming agent requests...
+              </td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+
+  <!-- Inspection Modal Drawer -->
+  <div class="drawer-overlay" id="drawer" onclick="closeDrawer(event)">
+    <div class="drawer-box" onclick="event.stopPropagation()">
+      <div class="drawer-header">
+        <strong id="drawer-title">Request Inspector</strong>
+        <button class="close-btn" onclick="closeDrawer()">&times;</button>
+      </div>
+      <div class="drawer-body" id="drawer-content"></div>
+    </div>
+  </div>
+
+  <!-- Toast -->
+  <div class="toast" id="toast">Changes saved</div>
+
+  <script>
+    let currentConfig = {};
+    let trafficLogs = [];
+    let autostartInfo = {};
+
+    function showToast(msg) {
+      const t = document.getElementById('toast');
+      t.innerText = msg;
+      t.classList.add('show');
+      setTimeout(() => t.classList.remove('show'), 2400);
+    }
+
+    function copyEndpoint() {
+      const text = document.getElementById('endpoint-text').innerText;
+      navigator.clipboard.writeText(text).then(() => {
+        showToast('Base URL copied: ' + text);
+      }).catch(() => {
+        showToast('Copied: ' + text);
+      });
+    }
+
+    const PRESETS = {
+      '9router': { protocol: 'http', host: '127.0.0.1', port: 20128, basePath: '', key: '' },
+      'litellm': { protocol: 'http', host: '127.0.0.1', port: 4000, basePath: '', key: '' },
+      'openrouter': { protocol: 'https', host: 'openrouter.ai', port: 443, basePath: '/api/v1', key: '' },
+      'gemini': { protocol: 'https', host: 'generativelanguage.googleapis.com', port: 443, basePath: '/v1beta/openai', key: '' },
+      'custom': {}
+    };
+
+    function applyPreset() {
+      const pKey = document.getElementById('router-preset').value;
+      const p = PRESETS[pKey];
+      if (!p || pKey === 'custom') return;
+      document.getElementById('cfg-targetProtocol').value = p.protocol;
+      document.getElementById('cfg-targetHost').value = p.host;
+      document.getElementById('cfg-targetPort').value = p.port;
+      document.getElementById('cfg-targetBasePath').value = p.basePath || '';
+      showToast('Loaded preset: ' + pKey);
+    }
+
+    let updateData = {};
+
+    function handleUpdateInfo(updates, ver) {
+      if (ver) document.getElementById('version-pill').innerText = 'v' + ver;
+      updateData = updates || {};
+      const banner = document.getElementById('update-banner');
+      if (updates && updates.updateAvailable) {
+        document.getElementById('latest-ver-text').innerText = 'v' + updates.latestVersion;
+        banner.style.display = 'inline-flex';
+      } else {
+        banner.style.display = 'none';
+      }
+    }
+
+    async function checkUpdatesManual() {
+      showToast('Checking for updates...');
+      try {
+        const res = await fetch('/api/check-update', { method: 'POST' });
+        const data = await res.json();
+        handleUpdateInfo(data, data.currentVersion);
+        if (data.updateAvailable) {
+          showToast('Update available: v' + data.latestVersion);
+        } else {
+          showToast('On latest version (v' + (data.currentVersion || '1.0.0') + ')');
+        }
+      } catch (err) {
+        showToast('Update check failed: ' + err.message);
+      }
+    }
+
+    function copyUpdateCmd() {
+      const cmd = updateData.updateCommand || 'git pull origin main';
+      navigator.clipboard.writeText(cmd).then(() => {
+        showToast('Copied update command: ' + cmd);
+      });
+    }
+
+    async function triggerWebUpdate() {
+      if (!confirm('Run self-update now?')) return;
+      showToast('Updating OMNIX-Shield...');
+      try {
+        const res = await fetch('/api/update', { method: 'POST' });
+        const result = await res.json();
+        if (result.ok) {
+          showToast('✔ Update successful! Refreshing...');
+          setTimeout(() => window.location.reload(), 1500);
+        } else {
+          alert('Update failed: ' + (result.error || result.command || 'Check permissions'));
+        }
+      } catch (err) {
+        showToast('Update error: ' + err.message);
+      }
+    }
+
+    async function loadStatus() {
+      try {
+        const res = await fetch('/api/status');
+        const data = await res.json();
+        if (data.version || data.updates) {
+          handleUpdateInfo(data.updates, data.version);
+        }
+        currentConfig = data.config || {};
+        applyConfigToUI(currentConfig);
+        updateKPIs(data.stats || {});
+        if (data.autostart) {
+          updateAutostartUI(data.autostart);
+        }
+        if (data.logs && Array.isArray(data.logs)) {
+          trafficLogs = data.logs;
+          renderTraffic();
+        }
+      } catch (err) {
+        console.error('Failed to load status:', err);
+      }
+    }
+
+    function updateAutostartUI(info) {
+      autostartInfo = info;
+      const toggle = document.getElementById('cfg-autostart');
+      const pill = document.getElementById('autostart-pill');
+      const desc = document.getElementById('autostart-desc');
+
+      toggle.checked = !!info.enabled;
+      if (info.enabled) {
+        pill.innerText = 'Boot: ACTIVE';
+        pill.classList.add('pill-active');
+        desc.innerText = `Auto-start active (${info.platform} / ${info.type || 'service'}) -> ${info.path}`;
+      } else {
+        pill.innerText = 'Boot: OFF';
+        pill.classList.remove('pill-active');
+        const hint = info.platform === 'linux' ? ' (systemd-user / desktop)' : '';
+        desc.innerText = `Auto-start disabled on ${info.platform}${hint}`;
+      }
+    }
+
+    function copyLinuxService() {
+      const cmd = 'sudo node ' + (autostartInfo.scriptPath || 'index.js') + ' --install-systemd';
+      navigator.clipboard.writeText(cmd).then(() => {
+        showToast('Copied: ' + cmd);
+      }).catch(() => {
+        showToast('Command: ' + cmd);
+      });
+    }
+
+    async function toggleAutostart() {
+      const enable = document.getElementById('cfg-autostart').checked;
+      try {
+        const res = await fetch('/api/autostart', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ enabled: enable })
+        });
+        const data = await res.json();
+        updateAutostartUI(data);
+        showToast(enable ? 'Enabled system boot autostart' : 'Disabled boot autostart');
+      } catch (err) {
+        showToast('Error toggling autostart: ' + err.message);
+      }
+    }
+
+    async function testUpstreamConnection() {
+      const box = document.getElementById('test-result-box');
+      box.style.display = 'block';
+      box.style.background = 'rgba(59, 130, 246, 0.1)';
+      box.style.border = '1px solid rgba(59, 130, 246, 0.3)';
+      box.style.color = '#93c5fd';
+      box.innerText = 'Testing connection to upstream router...';
+
+      const targetProtocol = document.getElementById('cfg-targetProtocol').value;
+      const targetHost = document.getElementById('cfg-targetHost').value.trim() || '127.0.0.1';
+      const targetPort = parseInt(document.getElementById('cfg-targetPort').value, 10) || 20128;
+      const targetApiKey = document.getElementById('cfg-targetApiKey').value.trim();
+
+      try {
+        const res = await fetch('/api/test-upstream', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ targetProtocol, targetHost, targetPort, targetApiKey })
+        });
+        const data = await res.json();
+        if (data.ok) {
+          box.style.background = 'rgba(16, 185, 129, 0.15)';
+          box.style.border = '1px solid rgba(16, 185, 129, 0.3)';
+          box.style.color = '#34d399';
+          box.innerText = `✔ ${data.message}`;
+        } else {
+          box.style.background = 'rgba(239, 68, 68, 0.15)';
+          box.style.border = '1px solid rgba(239, 68, 68, 0.3)';
+          box.style.color = '#f87171';
+          box.innerText = `✖ ${data.message}`;
+        }
+      } catch (err) {
+        box.style.background = 'rgba(239, 68, 68, 0.15)';
+        box.style.border = '1px solid rgba(239, 68, 68, 0.3)';
+        box.style.color = '#f87171';
+        box.innerText = '✖ Test failed: ' + err.message;
+      }
+    }
+
+    function toggleSubPanel(id) {
+      const panel = document.getElementById(id);
+      if (!panel) return;
+      panel.classList.toggle('active');
+    }
+
+    function setUAPreset(preset) {
+      const input = document.getElementById('cfg-customUserAgent');
+      if (preset === 'node') input.value = 'OpenAI/NodeJS/4.0.0 (Windows NT 10.0; Win64; x64)';
+      else if (preset === 'python') input.value = 'OpenAI/Python 1.12.0';
+      else if (preset === 'cursor') input.value = 'Cursor/0.40.0';
+      else if (preset === 'curl') input.value = 'curl/8.4.0';
+    }
+
+    async function saveSignatureRules() {
+      const replacementText = document.getElementById('cfg-signatureReplacementText').value;
+      const patternsRaw = document.getElementById('cfg-signaturePatterns').value;
+      const patterns = patternsRaw.split('\n').map(s => s.trim()).filter(Boolean);
+      await postConfig({
+        signatureReplacementText: replacementText,
+        signaturePatterns: patterns
+      });
+      showToast('Saved signature rules (' + patterns.length + ' patterns)');
+    }
+
+    async function updateToolRule(key) {
+      const val = document.getElementById('cfg-' + key).checked;
+      await postConfig({ [key]: val });
+      showToast('Tool rule ' + key + ' -> ' + val);
+    }
+
+    async function saveReasoningRules() {
+      const source = document.getElementById('cfg-reasoningEffortSource').value.trim() || 'none';
+      const target = document.getElementById('cfg-reasoningEffortTarget').value;
+      await postConfig({
+        reasoningEffortSource: source,
+        reasoningEffortTarget: target
+      });
+      showToast('Saved reasoning mapping: "' + source + '" -> "' + target + '"');
+    }
+
+    async function saveTitleRules() {
+      const titleText = document.getElementById('cfg-mockTitleText').value.trim() || 'New Session';
+      const keywords = document.getElementById('cfg-mockTitleKeywords').value.trim();
+      await postConfig({
+        mockTitleText: titleText,
+        mockTitleKeywords: keywords
+      });
+      showToast('Saved local title response rules');
+    }
+
+    async function saveUARules() {
+      const ua = document.getElementById('cfg-customUserAgent').value.trim();
+      await postConfig({ customUserAgent: ua });
+      showToast('Saved custom User-Agent header');
+    }
+
+    function setSafeValue(id, val) {
+      const el = document.getElementById(id);
+      if (el && document.activeElement !== el) {
+        el.value = val !== undefined ? val : '';
+      }
+    }
+
+    function applyConfigToUI(cfg) {
+      if (!cfg) return;
+      document.getElementById('cfg-promptSurgery').checked = !!cfg.promptSurgery;
+        document.getElementById('cfg-assistantName').value = c.assistantName || 'OMNIX Assistant';
+        document.getElementById('cfg-assistantMaker').value = c.assistantMaker || 'the development team';
+        if (document.getElementById('cfg-preserveSoul')) document.getElementById('cfg-preserveSoul').checked = c.preserveSoul !== false;
+        if (document.getElementById('cfg-preserveMemory')) document.getElementById('cfg-preserveMemory').checked = c.preserveMemory !== false;
+        if (document.getElementById('cfg-preserveSkills')) document.getElementById('cfg-preserveSkills').checked = c.preserveSkills !== false;
+        if (document.getElementById('cfg-preserveProfile')) document.getElementById('cfg-preserveProfile').checked = c.preserveProfile !== false;
+        if (document.getElementById('cfg-preserveCliNote')) document.getElementById('cfg-preserveCliNote').checked = c.preserveCliNote !== false;
+        if (document.getElementById('cfg-preserveEnvironment')) document.getElementById('cfg-preserveEnvironment').checked = c.preserveEnvironment !== false;
+      document.getElementById('cfg-simplifyToolSchemas').checked = !!cfg.simplifyToolSchemas;
+      document.getElementById('cfg-fixReasoningEffort').checked = !!cfg.fixReasoningEffort;
+      document.getElementById('cfg-mockLocalTitles').checked = !!cfg.mockLocalTitles;
+      document.getElementById('cfg-spoofUserAgent').checked = !!cfg.spoofUserAgent;
+      
+      setSafeValue('cfg-targetProtocol', cfg.targetProtocol || 'http');
+      setSafeValue('cfg-targetHost', cfg.targetHost || '127.0.0.1');
+      setSafeValue('cfg-targetPort', cfg.targetPort || 20128);
+      setSafeValue('cfg-targetApiKey', cfg.targetApiKey || '');
+      setSafeValue('cfg-targetBasePath', cfg.targetBasePath || '');
+
+      setSafeValue('cfg-signatureReplacementText', cfg.signatureReplacementText || 'You are a helpful AI assistant.');
+      if (Array.isArray(cfg.signaturePatterns)) {
+        setSafeValue('cfg-signaturePatterns', cfg.signaturePatterns.join('\n'));
+      }
+      document.getElementById('cfg-stripStrict').checked = cfg.stripStrict !== false;
+      document.getElementById('cfg-stripSchemaUrl').checked = cfg.stripSchemaUrl !== false;
+      document.getElementById('cfg-stripAdditionalProperties').checked = cfg.stripAdditionalProperties !== false;
+      document.getElementById('cfg-stripValidationBounds').checked = cfg.stripValidationBounds !== false;
+      document.getElementById('cfg-collapseAnyOf').checked = cfg.collapseAnyOf !== false;
+
+      setSafeValue('cfg-reasoningEffortSource', cfg.reasoningEffortSource || 'none');
+      setSafeValue('cfg-reasoningEffortTarget', cfg.reasoningEffortTarget || 'low');
+
+      setSafeValue('cfg-mockTitleText', cfg.mockTitleText || 'New Session');
+      setSafeValue('cfg-mockTitleKeywords', cfg.mockTitleKeywords || '');
+
+      setSafeValue('cfg-customUserAgent', cfg.customUserAgent || 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36');
+
+      const port = cfg.listenPort || window.location.port || 20129;
+      document.getElementById('endpoint-text').innerText = 'http://127.0.0.1:' + port + '/v1';
+      document.getElementById('target-pill').innerText = 'Target: ' + (cfg.targetProtocol || 'http') + '://' + (cfg.targetHost || '127.0.0.1') + ':' + (cfg.targetPort || 20128);
+
+      renderReplacements(cfg.customReplacements || []);
+    }
+
+    function updateKPIs(stats) {
+      document.getElementById('kpi-total').innerText = stats.totalRequests || 0;
+      document.getElementById('kpi-sanitized').innerText = stats.sanitizedCount || 0;
+      document.getElementById('kpi-saved').innerText = stats.savedTitleCalls || 0;
+      document.getElementById('kpi-errors').innerText = stats.errorCount || 0;
+    }
+
+    async function updateText(key) {
+        const el = document.getElementById('cfg-' + key);
+        if (el) postConfig({ [key]: el.value });
+      }
+      function updateToggle(key) {
+      const val = document.getElementById('cfg-' + key).checked;
+      currentConfig[key] = val;
+      await postConfig({ [key]: val });
+      showToast('Updated ' + key + ' -> ' + val);
+    }
+
+    async function saveTarget() {
+      const targetProtocol = document.getElementById('cfg-targetProtocol').value;
+      const targetHost = document.getElementById('cfg-targetHost').value.trim() || '127.0.0.1';
+      const targetPort = parseInt(document.getElementById('cfg-targetPort').value, 10) || 20128;
+      const targetApiKey = document.getElementById('cfg-targetApiKey').value.trim();
+      const targetBasePath = document.getElementById('cfg-targetBasePath').value.trim();
+
+      currentConfig.targetProtocol = targetProtocol;
+      currentConfig.targetHost = targetHost;
+      currentConfig.targetPort = targetPort;
+      currentConfig.targetApiKey = targetApiKey;
+      currentConfig.targetBasePath = targetBasePath;
+
+      await postConfig({ targetProtocol, targetHost, targetPort, targetApiKey, targetBasePath });
+      document.getElementById('target-pill').innerText = 'Target: ' + targetProtocol + '://' + targetHost + ':' + targetPort;
+      showToast('Upstream router saved: ' + targetProtocol + '://' + targetHost + ':' + targetPort);
+    }
+
+    async function addReplacement() {
+      const fInput = document.getElementById('new-find');
+      const rInput = document.getElementById('new-replace');
+      const find = fInput.value;
+      const replace = rInput.value;
+      if (!find) return;
+
+      const list = currentConfig.customReplacements || [];
+      list.push({ find, replace });
+      currentConfig.customReplacements = list;
+      fInput.value = '';
+      rInput.value = '';
+      await postConfig({ customReplacements: list });
+      renderReplacements(list);
+      showToast('Added replacement rule');
+    }
+
+    async function removeReplacement(index) {
+      const list = currentConfig.customReplacements || [];
+      list.splice(index, 1);
+      currentConfig.customReplacements = list;
+      await postConfig({ customReplacements: list });
+      renderReplacements(list);
+      showToast('Removed rule');
+    }
+
+    function renderReplacements(list) {
+      const el = document.getElementById('rep-list');
+      if (!list || list.length === 0) {
+        el.innerHTML = '<div style="color:var(--text-sub);font-size:0.75rem;padding:6px;">No custom rules configured</div>';
+        return;
+      }
+      el.innerHTML = list.map((item, idx) => `
+        <div class="rep-item">
+          <span>"${escapeHtml(item.find)}" &rarr; "${escapeHtml(item.replace)}"</span>
+          <button class="rep-del" onclick="removeReplacement(${idx})">&times;</button>
+        </div>
+      `).join('');
+    }
+
+    async function postConfig(patch) {
+      try {
+        const res = await fetch('/api/config', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify(patch)
+        });
+        const data = await res.json();
+        if (data.config) {
+          currentConfig = data.config;
+        }
+      } catch (err) {
+        console.error('Failed to post config:', err);
+      }
+    }
+
+    async function clearLogs() {
+      try {
+        await fetch('/api/clear-logs', { method: 'POST' });
+        trafficLogs = [];
+        renderTraffic();
+        showToast('Log history cleared');
+      } catch (err) {
+        console.error(err);
+      }
+    }
+
+    function renderTraffic() {
+      const tbody = document.getElementById('traffic-body');
+      if (!trafficLogs || trafficLogs.length === 0) {
+        tbody.innerHTML = `
+          <tr>
+            <td colspan="7" style="text-align:center; color:var(--text-sub); padding:30px;">
+              Waiting for incoming agent requests...
+            </td>
+          </tr>
+        `;
+        return;
+      }
+
+      tbody.innerHTML = trafficLogs.map((log, idx) => {
+        let badgeClass = 'badge-200';
+        const st = String(log.status);
+        if (st.includes('LOCAL')) badgeClass = 'badge-local';
+        else if (st.startsWith('4')) badgeClass = 'badge-warn';
+        else if (st.startsWith('5')) badgeClass = 'badge-err';
+
+        const timeStr = log.timestamp ? log.timestamp.split('T')[1].split('.')[0] : '';
+        return `
+          <tr>
+            <td style="font-family:var(--mono);color:var(--text-muted);">${timeStr}</td>
+            <td style="font-family:var(--mono);">
+              <strong>${log.method}</strong> ${escapeHtml(log.path)}
+              ${log.sanitized ? '<span class="tag-sanitized">SANITIZED</span>' : ''}
+              ${log.status >= 400 && log.snippet ? `<div style="font-size:0.71rem; color:#f87171; margin-top:2px; font-weight:500;">⚠️ ${escapeHtml(log.snippet)}</div>` : ''}
+            </td>
+            <td style="font-family:var(--mono);color:#93c5fd;">${escapeHtml(log.model || '—')}</td>
+            <td style="font-family:var(--mono);">${log.toolCount > 0 ? log.toolCount + ' tools' : '—'}</td>
+            <td><span class="badge ${badgeClass}">${escapeHtml(st)}</span></td>
+            <td style="font-family:var(--mono);color:var(--text-muted);">${log.latencyMs}ms</td>
+            <td><button class="btn-secondary" onclick="openDrawer(${idx})">Inspect</button></td>
+          </tr>
+        `;
+      }).join('');
+    }
+
+    function openDrawer(idx) {
+      const log = trafficLogs[idx];
+      if (!log) return;
+      document.getElementById('drawer-title').innerText = `${log.method} ${log.path} [${log.status}]`;
+      document.getElementById('drawer-content').innerText = JSON.stringify({
+        id: log.id,
+        timestamp: log.timestamp,
+        method: log.method,
+        path: log.path,
+        model: log.model,
+        toolCount: log.toolCount,
+        status: log.status,
+        latencyMs: log.latencyMs,
+        sanitized: log.sanitized,
+        snippet: log.snippet,
+        details: log.details || {}
+      }, null, 2);
+      document.getElementById('drawer').classList.add('active');
+    }
+
+    function closeDrawer(e) {
+      document.getElementById('drawer').classList.remove('active');
+    }
+
+    function escapeHtml(str) {
+      if (!str) return '';
+      return String(str).replace(/[&<>"']/g, m => ({
+        '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;'
+      })[m]);
+    }
+
+    let eventSource = null;
+
+    function initSSE() {
+      if (eventSource) {
+        try { eventSource.close(); } catch (_) {}
+      }
+      eventSource = new EventSource('/api/events');
+      eventSource.onmessage = (e) => {
+        try {
+          const ev = JSON.parse(e.data);
+          if (ev.type === 'log') {
+            trafficLogs.unshift(ev.data);
+            if (trafficLogs.length > 50) trafficLogs.pop();
+            renderTraffic();
+          } else if (ev.type === 'stats') {
+            updateKPIs(ev.data);
+          } else if (ev.type === 'config') {
+            currentConfig = ev.data;
+            applyConfigToUI(ev.data);
+          } else if (ev.type === 'autostart') {
+            updateAutostartUI(ev.data);
+          }
+        } catch (err) {
+          console.error(err);
+        }
+      };
+      eventSource.onerror = () => {
+        setTimeout(initSSE, 4000);
+      };
+    }
+
+    window.addEventListener('DOMContentLoaded', () => {
+      loadStatus();
+      initSSE();
+      // Automatic live polling every 2.5 seconds (zero refresh required)
+      setInterval(loadStatus, 2500);
+    });
+  </script>
+</body>
+</html>
