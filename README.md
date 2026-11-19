@@ -36,19 +36,57 @@ OMNIX-Shield solves this with **Prompt Surgery**: it moves the agent's personali
 
 ## Quick Start
 
+### Windows
+
 ```bash
 # Clone
 git clone https://github.com/bieeins/ag-shield-onix.git
 cd ag-shield-onix
 
-# Run (zero dependencies — Node.js only)
+# Run (zero dependencies)
 node index.js
 
 # Custom port and assistant name
 node index.js --port 20130 --name "My Assistant"
 ```
 
-Open **http://127.0.0.1:20130/ui** for the dashboard.
+### macOS
+
+```bash
+# Install Node.js if not installed
+brew install node
+
+# Clone
+git clone https://github.com/bieeins/ag-shield-onix.git
+cd ag-shield-onix
+
+# Set API key (add to ~/.zshrc for permanent)
+export NINE_ROUTER_API_KEY="your-api-key-here"
+
+# Run
+node index.js
+```
+
+**macOS notes:**
+- System tray (`tray.ps1`) is Windows-only — ignore on Mac
+- Autostart: add to Login Items or use `launchctl`
+- Tested on macOS 13+ (Ventura, Sonoma, Sequoia)
+
+### Linux
+
+```bash
+# Clone
+git clone https://github.com/bieeins/ag-shield-onix.git
+cd ag-shield-onix
+
+# Set API key
+export NINE_ROUTER_API_KEY="your-api-key-here"
+
+# Run
+node index.js
+
+# Optional: run as systemd service (see autostart in dashboard UI)
+```
 
 ### Requirements
 
@@ -62,18 +100,24 @@ Open **http://127.0.0.1:20130/ui** for the dashboard.
    node index.js
    ```
 
-2. Configure Hermes (`~/.hermes/config.yaml`):
+2. Configure Hermes config:
+
+   **Windows** (`%LOCALAPPDATA%\hermes\config.yaml`):
    ```yaml
    model:
      default: "ag/gemini-2.5-flash"
-     provider: "9router"
-   providers:
-     9router:
-       name: "9Router via OMNIX-Shield"
-       api: "http://localhost:20130/v1"
-       api_key_env: "NINE_ROUTER_API_KEY"
-       transport: chat_completions
-       discover_models: true
+     provider: "custom"
+     base_url: "http://localhost:20130/v1"
+     api_key_env: "NINE_ROUTER_API_KEY"
+   ```
+
+   **macOS** (`~/Library/Application Support/hermes/config.yaml` or `~/.hermes/config.yaml`):
+   ```yaml
+   model:
+     default: "ag/gemini-2.5-flash"
+     provider: "custom"
+     base_url: "http://localhost:20130/v1"
+     api_key_env: "NINE_ROUTER_API_KEY"
    ```
 
 3. Run Hermes:
