@@ -963,7 +963,7 @@
           handleUpdateInfo(data.updates, data.version);
         }
         currentConfig = data.config || {};
-        applyConfigToUI(currentConfig);
+        try { applyConfigToUI(currentConfig); } catch(e) { console.warn("applyConfigToUI err:", e.message); }
         updateKPIs(data.stats || {});
         if (data.autostart) {
           updateAutostartUI(data.autostart);
