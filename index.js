@@ -173,7 +173,7 @@ function killProcessOnPort(port) {
 
 // --- CLI ---
 const args = process.argv.slice(2);
-let fileLogging = false;
+let fileLogging = config.fileLogging || false;
 
 for (let i = 0; i < args.length; i++) {
   const arg = args[i];
@@ -589,7 +589,7 @@ const server = http.createServer((req, res) => {
   // API: Status
   if (pathname === '/api/status' && req.method === 'GET') {
     res.writeHead(200, { 'Content-Type': 'application/json' });
-    return res.end(JSON.stringify({ version: PKG_VERSION, config, stats: getStats(), autostart: getAutostartInfo(), logs: trafficLogs }));
+    return res.end(JSON.stringify({ version: PKG_VERSION, config, stats: getStats(), autostart: getAutostartInfo(), logs: trafficLogs, fileLogging, logPath: LOG_FILE }));
   }
 
   // API: Config GET
@@ -619,7 +619,37 @@ const server = http.createServer((req, res) => {
   }
 
   // API: Clear logs
-  if (pathname === '/api/clear-logs' && req.method === 'POST') {
+  // API: Toggle file logging
+  if (pathname === '/api/logging' && req.method === 'POST') {
+    let body = '';
+    req.on('data', d => body += d);
+    req.on('end', () => {
+      try {
+        const { enabled } = JSON.parse(body);
+        fileLogging = !!enabled;
+        config.fileLogging = fileLogging;
+        saveConfig();
+        if (fileLogging) {
+          try { fs.writeFileSync(LOG_FILE, `=== Log started ${new Date().toISOString()} ===\n`); } catch(_) {}
+        }
+        res.writeHead(200, { 'Content-Type': 'application/json' });
+        return res.end(JSON.stringify({ fileLogging }));
+      } catch(e) { res.writeHead(400); return res.end('bad request'); }
+    });
+    return;
+  }
+
+  // API: Read log file
+  if (pathname === '/api/log-file' && req.method === 'GET') {
+    res.writeHead(200, { 'Content-Type': 'application/json' });
+    try {
+      const content = fs.existsSync(LOG_FILE) ? fs.readFileSync(LOG_FILE, 'utf8') : '';
+      const lines = content.split('\n').filter(Boolean).slice(-200); // last 200 lines
+      return res.end(JSON.stringify({ lines, fileLogging, path: LOG_FILE }));
+    } catch(e) { return res.end(JSON.stringify({ lines: [], fileLogging, path: LOG_FILE })); }
+  }
+
+    if (pathname === '/api/clear-logs' && req.method === 'POST') {
     trafficLogs.length = 0;
     res.writeHead(200, { 'Content-Type': 'application/json' });
     return res.end(JSON.stringify({ success: true }));

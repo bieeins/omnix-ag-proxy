@@ -858,6 +858,29 @@
     </div>
   </div>
 
+  <!-- File Logging Section -->
+  <div style="margin:24px 0; background:var(--card-bg,#1a1a2e); border:1px solid var(--border,#2a2a4a); border-radius:12px; padding:24px;">
+    <div style="display:flex; align-items:center; justify-content:space-between; margin-bottom:16px;">
+      <div>
+        <div style="font-weight:600; font-size:1rem;">📄 File Logging</div>
+        <div style="font-size:0.8rem; color:var(--text-sub,#888); margin-top:2px;">Write all traffic to <code>traffic.log</code> on disk</div>
+      </div>
+      <label style="display:flex; align-items:center; gap:10px; cursor:pointer;">
+        <span id="logging-status-text" style="font-size:0.8rem; color:#888;">OFF</span>
+        <input type="checkbox" id="cfg-fileLogging" onchange="toggleFileLogging(this.checked)" style="width:18px;height:18px;cursor:pointer;">
+      </label>
+    </div>
+    <div style="display:flex; gap:8px; margin-bottom:12px;">
+      <button class="btn-secondary" onclick="refreshLogFile()" style="flex:1;">↻ Refresh Log</button>
+      <button class="btn-secondary" onclick="clearLogFile()" style="flex:1;">🗑 Clear Log</button>
+      <button class="btn-secondary" onclick="downloadLog()" style="flex:1;">⬇ Download</button>
+    </div>
+    <div id="log-file-viewer" style="background:#0d0d1a; border:1px solid #2a2a4a; border-radius:8px; padding:12px; height:300px; overflow-y:auto; font-family:monospace; font-size:0.72rem; color:#a3e635; white-space:pre-wrap; word-break:break-all;">
+      <span style="color:#666;">Click "Refresh Log" to load file contents...</span>
+    </div>
+    <div id="log-file-path" style="font-size:0.7rem; color:#555; margin-top:6px;"></div>
+  </div>
+
   <!-- Toast -->
   <div class="toast" id="toast">Changes saved</div>
 
@@ -989,6 +1012,15 @@
 
       // Updates
       try { if (data.version || data.updates) handleUpdateInfo(data.updates, data.version); } catch(e) {}
+
+      // Sync logging toggle
+      try {
+        if (typeof data.fileLogging !== 'undefined') {
+          document.getElementById('cfg-fileLogging').checked = !!data.fileLogging;
+          document.getElementById('logging-status-text').innerText = data.fileLogging ? 'ON' : 'OFF';
+          document.getElementById('logging-status-text').style.color = data.fileLogging ? '#22c55e' : '#888';
+        }
+      } catch(e) {}
     }
 
     function updateAutostartUI(info) {
@@ -1389,7 +1421,39 @@
       };
     }
 
-    window.addEventListener('DOMContentLoaded', () => {
+    async function toggleFileLogging(enabled) {
+      await fetch('/api/logging', { method: 'POST', headers: {'Content-Type':'application/json'}, body: JSON.stringify({ enabled }) });
+      document.getElementById('logging-status-text').innerText = enabled ? 'ON' : 'OFF';
+      document.getElementById('logging-status-text').style.color = enabled ? '#22c55e' : '#888';
+      if (enabled) refreshLogFile();
+      showToast('File logging ' + (enabled ? 'enabled' : 'disabled'));
+    }
+
+    async function refreshLogFile() {
+      try {
+        const r = await fetch('/api/log-file');
+        const d = await r.json();
+        const viewer = document.getElementById('log-file-viewer');
+        viewer.textContent = d.lines.length ? d.lines.join('\n') : '(empty)';
+        viewer.scrollTop = viewer.scrollHeight;
+        document.getElementById('log-file-path').textContent = 'Path: ' + d.path;
+        document.getElementById('cfg-fileLogging').checked = d.fileLogging;
+        document.getElementById('logging-status-text').innerText = d.fileLogging ? 'ON' : 'OFF';
+        document.getElementById('logging-status-text').style.color = d.fileLogging ? '#22c55e' : '#888';
+      } catch(e) { console.error(e); }
+    }
+
+    async function clearLogFile() {
+      await fetch('/api/clear-logs', { method: 'POST' });
+      document.getElementById('log-file-viewer').textContent = '(cleared)';
+      showToast('Log cleared');
+    }
+
+    function downloadLog() {
+      window.open('/api/log-file', '_blank');
+    }
+
+        window.addEventListener('DOMContentLoaded', () => {
       loadStatus();
       initSSE();
       // Automatic live polling every 2.5 seconds (zero refresh required)
