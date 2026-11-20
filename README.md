@@ -1,6 +1,6 @@
 # OMNIX-Shield
 
-Agentic AI Sanitizer Proxy — combines [AG-Shield](https://github.com/NaWeeDBHR/ag-shield) operational features with OMNIX v10 Prompt Surgery for reliable Antigravity model access from third-party coding agents.
+Agentic AI Sanitizer Proxy — reliable Antigravity model access from third-party coding agents via Prompt Surgery.
 
 ## What It Does
 
@@ -12,7 +12,6 @@ OMNIX-Shield solves this with **Prompt Surgery**: it moves the agent's personali
 
 ## Features
 
-### From OMNIX v10 (Prompt Surgery)
 - **System prompt surgery** — replaces structural fingerprints that trigger detection
 - **Soul/identity preservation** — agent personality moved to user message, not deleted
 - **Memory preservation** — persistent memory context survives the rewrite
@@ -20,19 +19,19 @@ OMNIX-Shield solves this with **Prompt Surgery**: it moves the agent's personali
 - **Environment context** — CWD, OS, paths, shell info preserved
 - **Configurable assistant name** — set via dashboard, CLI, or config file
 - **Per-section toggles** — choose exactly what to preserve or strip
-
-### From AG-Shield
 - **Web dashboard** (`/ui`) — real-time traffic logs, config editor, section toggles
 - **Tool schema simplifier** — strips `strict`, `$schema`, `additionalProperties`, `anyOf`
 - **Title mocker** — handles `session_title` requests locally (saves quota)
 - **User-Agent spoofing** — masks client identity headers
 - **429 retry with backoff** — automatic retry on rate limits
 - **Reasoning effort control** — strip or remap `reasoning_effort` field
-- **Windows system tray** — background operation with tray icon
-- **Autostart** — Windows startup, macOS launchd, Linux systemd
+- **Interactive launcher** — arrow-key menu: Web UI / Terminal / Background / Tray
+- **Windows system tray** — background operation with tray icon & dashboard access
+- **Autostart** — Windows startup shortcut, Linux systemd
 - **CLI management** — `stop`, `restart`, `status` commands
 - **Config persistence** — settings saved to JSON, survives restarts
 - **SSE event stream** — live dashboard updates via Server-Sent Events
+- **File logging** — optional traffic log with auto-rotate at 10MB
 
 ## Quick Start
 
@@ -43,11 +42,14 @@ OMNIX-Shield solves this with **Prompt Surgery**: it moves the agent's personali
 git clone https://github.com/bieeins/ag-shield-onix.git
 cd ag-shield-onix
 
-# Run (zero dependencies)
+# Interactive launcher (recommended)
+node start.js
+
+# Or direct run (zero dependencies)
 node index.js
 
 # Custom port and assistant name
-node index.js --port 20130 --name "My Assistant"
+node index.js --port 20129 --name "My Assistant"
 ```
 
 ### macOS
@@ -70,7 +72,6 @@ node index.js
 **macOS notes:**
 - System tray (`tray.ps1`) is Windows-only — ignore on Mac
 - Autostart: add to Login Items or use `launchctl`
-- Tested on macOS 13+ (Ventura, Sonoma, Sequoia)
 
 ### Linux
 
@@ -85,7 +86,9 @@ export NINE_ROUTER_API_KEY="your-api-key-here"
 # Run
 node index.js
 
-# Optional: run as systemd service (see autostart in dashboard UI)
+# Optional: run as systemd service
+sudo cp omnix-shield.service /etc/systemd/system/
+sudo systemctl enable --now omnix-shield
 ```
 
 ### Requirements
@@ -93,11 +96,20 @@ node index.js
 - **Node.js** 18+ (no npm install needed — zero dependencies)
 - **Upstream gateway** running on port 20128 (e.g., 9Router)
 
+## Launcher
+
+```bash
+node start.js           # Interactive menu
+node start.js tray      # Launch directly to system tray (used by autostart)
+node start.js status    # Show running instance status
+node start.js stop      # Stop running instance
+```
+
 ## Usage with Hermes Agent
 
 1. Start OMNIX-Shield:
    ```bash
-   node index.js
+   node start.js
    ```
 
 2. Configure Hermes config:
@@ -106,17 +118,17 @@ node index.js
    ```yaml
    model:
      default: "ag/gemini-2.5-flash"
-     provider: "custom"
-     base_url: "http://localhost:20130/v1"
+     provider: "ag-shield"
+     base_url: "http://localhost:20129/v1"
      api_key_env: "NINE_ROUTER_API_KEY"
    ```
 
-   **macOS** (`~/Library/Application Support/hermes/config.yaml` or `~/.hermes/config.yaml`):
+   **Linux** (`~/.hermes/config.yaml`):
    ```yaml
    model:
      default: "ag/gemini-2.5-flash"
-     provider: "custom"
-     base_url: "http://localhost:20130/v1"
+     provider: "ag-shield"
+     base_url: "http://localhost:20129/v1"
      api_key_env: "NINE_ROUTER_API_KEY"
    ```
 
@@ -131,7 +143,7 @@ node index.js
 node index.js [flags]
 
 Flags:
-  --port <port>         Listen port (default: 20130)
+  --port <port>         Listen port (default: 20129)
   --target-port <port>  Upstream port (default: 20128)
   --name <name>         Assistant name (default: OMNIX Assistant)
   --log, -l             Write traffic log to file
@@ -202,18 +214,14 @@ Settings are saved to `omnix-shield.config.json` and can be edited via:
 
 ```
 omnix-shield/
-├── index.js                    # Main proxy server (32KB, zero deps)
-├── ui.html                     # Web dashboard (58KB, self-contained)
+├── index.js                    # Main proxy server (zero deps)
+├── start.js                    # Interactive launcher
+├── ui.html                     # Web dashboard (self-contained)
 ├── tray.ps1                    # Windows system tray script
 ├── package.json                # npm package metadata
 ├── omnix-shield.config.json    # Saved configuration (auto-generated)
 └── README.md                   # This file
 ```
-
-## Credits
-
-- **[AG-Shield](https://github.com/NaWeeDBHR/ag-shield)** by NaWeeDBHR — operational framework (dashboard, tray, autostart, retry, schema simplifier, title mocker)
-- **OMNIX v10** — prompt surgery research and implementation (system-to-user message migration, structural fingerprint bypass)
 
 ## Disclaimer
 
