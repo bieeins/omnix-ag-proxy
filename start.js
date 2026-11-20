@@ -89,13 +89,8 @@ function startBackground() {
   if (process.platform === 'win32') {
     const trayScript = path.join(__dirname, 'tray.ps1');
     if (require('fs').existsSync(trayScript)) {
-      const tray = spawn('powershell', ['-ExecutionPolicy', 'Bypass', '-WindowStyle', 'Hidden', '-File', trayScript, '-NodePid', String(child.pid), '-Port', String(PORT)], {
-        detached: true,
-        stdio: 'ignore',
-        cwd: __dirname,
-      });
-      tray.unref();
-      console.log(`  Tray icon: ${G}active${R} (PID ${tray.pid})`);
+      execSync(`start /B powershell -ExecutionPolicy Bypass -WindowStyle Hidden -File "${trayScript}" -NodePid ${child.pid} -Port ${PORT}`, { stdio: 'ignore', shell: true });
+      console.log(`  Tray icon: ${G}active${R}`);
     }
   }
 
