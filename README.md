@@ -1,6 +1,6 @@
 # OMNIX-Shield
 
-Agentic AI Sanitizer Proxy — combines [AG-Shield](https://github.com/NaWeeDBHR/ag-shield) operational features with OMNIX v10 Prompt Surgery for reliable Antigravity model access from third-party coding agents.
+Agentic AI Sanitizer Proxy — OMNIX v10 Prompt Surgery for reliable Antigravity model access from third-party coding agents.
 
 ## What It Does
 
