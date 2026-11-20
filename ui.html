@@ -1127,14 +1127,14 @@
     function applyConfigToUI(cfg) {
       if (!cfg) return;
       document.getElementById('cfg-promptSurgery').checked = !!cfg.promptSurgery;
-        document.getElementById('cfg-assistantName').value = c.assistantName || 'OMNIX Assistant';
-        document.getElementById('cfg-assistantMaker').value = c.assistantMaker || 'the development team';
-        if (document.getElementById('cfg-preserveSoul')) document.getElementById('cfg-preserveSoul').checked = c.preserveSoul !== false;
-        if (document.getElementById('cfg-preserveMemory')) document.getElementById('cfg-preserveMemory').checked = c.preserveMemory !== false;
-        if (document.getElementById('cfg-preserveSkills')) document.getElementById('cfg-preserveSkills').checked = c.preserveSkills !== false;
-        if (document.getElementById('cfg-preserveProfile')) document.getElementById('cfg-preserveProfile').checked = c.preserveProfile !== false;
-        if (document.getElementById('cfg-preserveCliNote')) document.getElementById('cfg-preserveCliNote').checked = c.preserveCliNote !== false;
-        if (document.getElementById('cfg-preserveEnvironment')) document.getElementById('cfg-preserveEnvironment').checked = c.preserveEnvironment !== false;
+        document.getElementById('cfg-assistantName').value = cfg.assistantName || 'OMNIX Assistant';
+        document.getElementById('cfg-assistantMaker').value = cfg.assistantMaker || 'the development team';
+        if (document.getElementById('cfg-preserveSoul')) document.getElementById('cfg-preserveSoul').checked = cfg.preserveSoul !== false;
+        if (document.getElementById('cfg-preserveMemory')) document.getElementById('cfg-preserveMemory').checked = cfg.preserveMemory !== false;
+        if (document.getElementById('cfg-preserveSkills')) document.getElementById('cfg-preserveSkills').checked = cfg.preserveSkills !== false;
+        if (document.getElementById('cfg-preserveProfile')) document.getElementById('cfg-preserveProfile').checked = cfg.preserveProfile !== false;
+        if (document.getElementById('cfg-preserveCliNote')) document.getElementById('cfg-preserveCliNote').checked = cfg.preserveCliNote !== false;
+        if (document.getElementById('cfg-preserveEnvironment')) document.getElementById('cfg-preserveEnvironment').checked = cfg.preserveEnvironment !== false;
       document.getElementById('cfg-simplifyToolSchemas').checked = !!cfg.simplifyToolSchemas;
       document.getElementById('cfg-fixReasoningEffort').checked = !!cfg.fixReasoningEffort;
       document.getElementById('cfg-mockLocalTitles').checked = !!cfg.mockLocalTitles;
