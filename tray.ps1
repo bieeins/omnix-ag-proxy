@@ -6,7 +6,7 @@ Add-Type -AssemblyName System.Drawing
 
 $notify = New-Object System.Windows.Forms.NotifyIcon
 $notify.Icon = [System.Drawing.SystemIcons]::Shield
-$notify.Text = "AG-Shield Proxy (:$Port)"
+$notify.Text = "OMNIX-Shield Proxy (:$Port)"
 $notify.Visible = $true
 
 $contextMenu = New-Object System.Windows.Forms.ContextMenuStrip
@@ -20,7 +20,7 @@ $menuOpen.add_Click({
 $menuCopy = $contextMenu.Items.Add("Copy Base URL (v1)")
 $menuCopy.add_Click({
     [System.Windows.Forms.Clipboard]::SetText("http://127.0.0.1:$Port/v1")
-    $notify.ShowBalloonTip(2000, "AG-Shield", "Base URL copied to clipboard!", [System.Windows.Forms.ToolTipIcon]::Info)
+    $notify.ShowBalloonTip(2000, "OMNIX-Shield", "Base URL copied to clipboard!", [System.Windows.Forms.ToolTipIcon]::Info)
 })
 
 $contextMenu.Items.Add("-")
@@ -30,7 +30,7 @@ $menuStatus.Enabled = $false
 
 $contextMenu.Items.Add("-")
 
-$menuExit = $contextMenu.Items.Add("Exit AG-Shield")
+$menuExit = $contextMenu.Items.Add("Exit OMNIX-Shield")
 $menuExit.add_Click({
     $notify.Visible = $false
     if ($NodePid -gt 0) {
@@ -47,7 +47,7 @@ $notify.add_DoubleClick({
 })
 
 # Show balloon notification on startup
-$notify.ShowBalloonTip(2500, "AG-Shield Active", "Shield proxy running on http://127.0.0.1:$Port/v1`nDouble-click to open dashboard.", [System.Windows.Forms.ToolTipIcon]::Info)
+$notify.ShowBalloonTip(2500, "OMNIX-Shield Active", "Shield proxy running on http://127.0.0.1:$Port/v1`nDouble-click to open dashboard.", [System.Windows.Forms.ToolTipIcon]::Info)
 
 # Monitor parent Node process; if it dies, exit tray
 $timer = New-Object System.Windows.Forms.Timer

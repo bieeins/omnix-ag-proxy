@@ -84,6 +84,21 @@ function startBackground() {
   console.log(`\n${G}✓${R} OMNIX-Shield running in background (PID ${child.pid})`);
   console.log(`  Dashboard: ${C}http://localhost:${PORT}/ui${R}`);
   console.log(`  Log file:  ${D}${path.join(__dirname, 'omnix-shield.log')}${R}`);
+
+  // Launch system tray icon (Windows only)
+  if (process.platform === 'win32') {
+    const trayScript = path.join(__dirname, 'tray.ps1');
+    if (require('fs').existsSync(trayScript)) {
+      const tray = spawn('powershell', ['-ExecutionPolicy', 'Bypass', '-WindowStyle', 'Hidden', '-File', trayScript, '-NodePid', String(child.pid), '-Port', String(PORT)], {
+        detached: true,
+        stdio: 'ignore',
+        cwd: __dirname,
+      });
+      tray.unref();
+      console.log(`  Tray icon: ${G}active${R} (PID ${tray.pid})`);
+    }
+  }
+
   console.log(`\n  Stop: ${Y}node start.js stop${R}`);
   setTimeout(() => process.exit(0), 500);
 }
