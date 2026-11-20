@@ -1228,7 +1228,7 @@
         const el = document.getElementById('cfg-' + key);
         if (el) postConfig({ [key]: el.value });
       }
-      function updateToggle(key) {
+      async function updateToggle(key) {
       const val = document.getElementById('cfg-' + key).checked;
       currentConfig[key] = val;
       await postConfig({ [key]: val });
