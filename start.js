@@ -110,6 +110,10 @@ if (cmd === 'stop') {
   }
   process.exit(0);
 }
+if (cmd === 'tray') {
+  // Called by autostart shortcut — start background + tray silently
+  startBackground();
+}
 if (cmd === 'status') {
   const pid = isRunning();
   if (pid) {
