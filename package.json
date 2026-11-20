@@ -1,1 +1,15 @@
-﻿{"name":"omnix-shield","version":"1.0.0","description":"Agentic AI Sanitizer Proxy - AG-Shield + OMNIX v10 Prompt Surgery","main":"index.js","bin":{"omnix-shield":"index.js"},"scripts":{"start":"node index.js"},"license":"MIT"}
+﻿{
+    "name":  "omnix-shield",
+    "version":  "1.0.0",
+    "description":  "Agentic AI Sanitizer Proxy - AG-Shield + OMNIX v10 Prompt Surgery",
+    "main":  "index.js",
+    "bin":  {
+                "omnix-shield":  "index.js",
+                "omnix-launch":  "start.js"
+            },
+    "scripts":  {
+                    "start":  "node index.js",
+                    "launch":  "node start.js"
+                },
+    "license":  "MIT"
+}
