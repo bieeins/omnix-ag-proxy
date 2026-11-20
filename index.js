@@ -255,7 +255,22 @@ function logTraffic(entry) {
 function getStats() { return { ...stats, uptime: Math.floor((Date.now() - stats.startTime) / 1000) }; }
 
 const LOG_FILE = path.join(__dirname, 'traffic.log');
-function writeLog(text) { if (!fileLogging) return; try { fs.appendFileSync(LOG_FILE, text + '\n', 'utf8'); } catch (_) {} }
+const LOG_MAX_BYTES = 10 * 1024 * 1024; // 10MB auto-rotate
+function writeLog(text) {
+  if (!fileLogging) return;
+  try {
+    // Auto-rotate: if log exceeds 10MB, truncate to last 2MB
+    try {
+      const stat = fs.statSync(LOG_FILE);
+      if (stat.size > LOG_MAX_BYTES) {
+        const buf = fs.readFileSync(LOG_FILE, 'utf8');
+        const keep = buf.slice(-2 * 1024 * 1024); // keep last 2MB
+        fs.writeFileSync(LOG_FILE, `=== Log rotated ${new Date().toISOString()} (was ${(stat.size/1024/1024).toFixed(1)}MB) ===\n` + keep, 'utf8');
+      }
+    } catch (_) {}
+    fs.appendFileSync(LOG_FILE, text + '\n', 'utf8');
+  } catch (_) {}
+}
 
 // =====================================================================
 // OMNIX v10 PROMPT SURGERY — proven bypass for Antigravity detection
