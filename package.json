@@ -1,7 +1,7 @@
 ﻿{
     "name":  "omnix-shield",
     "version":  "1.0.0",
-    "description":  "Agentic AI Sanitizer Proxy - AG-Shield + OMNIX v10 Prompt Surgery",
+    "description":  "Agentic AI Sanitizer Proxy OMNIX v10 Prompt Surgery",
     "main":  "index.js",
     "bin":  {
                 "omnix-shield":  "index.js",

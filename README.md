@@ -39,8 +39,8 @@ OMNIX-Shield solves this with **Prompt Surgery**: it moves the agent's personali
 
 ```bash
 # Clone
-git clone https://github.com/bieeins/ag-shield-omnix.git
-cd ag-shield-omnix
+git clone https://github.com/bieeins/omnix-ag-proxy.git
+cd omnix-ag-proxy
 
 # Interactive launcher (recommended)
 node start.js
@@ -59,8 +59,8 @@ node index.js --port 20129 --name "My Assistant"
 brew install node
 
 # Clone
-git clone https://github.com/bieeins/ag-shield-omnix.git
-cd ag-shield-omnix
+git clone https://github.com/bieeins/omnix-ag-proxy.git
+cd omnix-ag-proxy
 
 # Set API key (add to ~/.zshrc for permanent)
 export NINE_ROUTER_API_KEY="your-api-key-here"
@@ -77,8 +77,8 @@ node index.js
 
 ```bash
 # Clone
-git clone https://github.com/bieeins/ag-shield-omnix.git
-cd ag-shield-omnix
+git clone https://github.com/bieeins/omnix-ag-proxy.git
+cd omnix-ag-proxy
 
 # Set API key
 export NINE_ROUTER_API_KEY="your-api-key-here"

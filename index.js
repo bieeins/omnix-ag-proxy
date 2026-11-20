@@ -196,7 +196,7 @@ if (process.env.ASSISTANT_NAME) config.assistantName = process.env.ASSISTANT_NAM
 
 function printHelp() {
   console.log(`
-OMNIX-SHIELD - Agentic AI Sanitizer Proxy (AG-Shield + OMNIX v10)
+OMNIX-SHIELD - Agentic AI Sanitizer Proxy OMNIX v10
 
 Usage: node index.js [flags]
 
@@ -381,7 +381,7 @@ function rewriteText(text) {
   return res;
 }
 
-// Simplify tool schemas (from AG-Shield)
+// Simplify tool schemas 
 function simplifySchema(schema) {
   if (!schema || typeof schema !== 'object') return schema;
   const copy = Array.isArray(schema) ? [...schema] : { ...schema };
@@ -397,7 +397,7 @@ function simplifySchema(schema) {
   return copy;
 }
 
-// Title generation mocker (from AG-Shield)
+// Title generation mocker 
 function isTitleRequest(body) {
   if (!body || !Array.isArray(body.messages) || body.messages.length === 0) return false;
   if (Array.isArray(body.tools) && body.tools.length > 0) return false;
@@ -837,7 +837,7 @@ if (require.main === module) {
     if (fileLogging) try { fs.writeFileSync(LOG_FILE, `=== Log started ${new Date().toISOString()} ===\n`); } catch (_) {}
     if (!args.includes('--no-tray') && process.platform === 'win32') startWindowsTray(config.listenPort);
     console.log(`
-  OMNIX-SHIELD (AG-Shield + OMNIX v10 Prompt Surgery)
+  OMNIX-SHIELD 
   ─────────────────────────────────────────────────
   Proxy:     http://127.0.0.1:${config.listenPort}/v1
   Upstream:  ${config.targetProtocol}://${config.targetHost}:${config.targetPort}
