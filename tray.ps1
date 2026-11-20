@@ -81,13 +81,20 @@ $notify.add_DoubleClick({
 
 $notify.ShowBalloonTip(2500, "OMNIX-Shield Active", "Proxy running on port $Port. Double-click to open dashboard.", [System.Windows.Forms.ToolTipIcon]::Info)
 
-# Monitor Node process
+# Monitor Node process - check port if no PID given
 $timer = New-Object System.Windows.Forms.Timer
-$timer.Interval = 2000
+$timer.Interval = 5000
 $timer.add_Tick({
     if ($NodePid -gt 0) {
         $proc = Get-Process -Id $NodePid -ErrorAction SilentlyContinue
         if (-not $proc) {
+            $notify.Visible = $false
+            [System.Windows.Forms.Application]::Exit()
+        }
+    } else {
+        # Check if port is still listening
+        $listening = Get-NetTCPConnection -LocalPort $Port -State Listen -ErrorAction SilentlyContinue
+        if (-not $listening) {
             $notify.Visible = $false
             [System.Windows.Forms.Application]::Exit()
         }
