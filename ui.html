@@ -956,25 +956,39 @@
     }
 
     async function loadStatus() {
+      let data;
       try {
         const res = await fetch('/api/status');
-        const data = await res.json();
-        if (data.version || data.updates) {
-          handleUpdateInfo(data.updates, data.version);
-        }
-        currentConfig = data.config || {};
-        try { applyConfigToUI(currentConfig); } catch(e) { console.warn("applyConfigToUI err:", e.message); }
-        updateKPIs(data.stats || {});
-        if (data.autostart) {
-          updateAutostartUI(data.autostart);
-        }
+        data = await res.json();
+      } catch (err) {
+        console.error('fetch /api/status failed:', err);
+        return;
+      }
+      // Update status pill
+      document.getElementById('status-dot') && (document.getElementById('status-dot').style.background = '#22c55e');
+
+      // KPIs - always run first, most important
+      try { updateKPIs(data.stats || {}); } catch(e) {}
+
+      // Traffic logs
+      try {
         if (data.logs && Array.isArray(data.logs)) {
           trafficLogs = data.logs;
           renderTraffic();
         }
-      } catch (err) {
-        console.error('Failed to load status:', err);
-      }
+      } catch(e) { console.warn('renderTraffic:', e); }
+
+      // Config UI - isolated, crash here won't break above
+      try {
+        currentConfig = data.config || {};
+        applyConfigToUI(currentConfig);
+      } catch(e) { console.warn('applyConfigToUI:', e.message); }
+
+      // Autostart
+      try { if (data.autostart) updateAutostartUI(data.autostart); } catch(e) {}
+
+      // Updates
+      try { if (data.version || data.updates) handleUpdateInfo(data.updates, data.version); } catch(e) {}
     }
 
     function updateAutostartUI(info) {
