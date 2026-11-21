@@ -7,7 +7,7 @@ const path = require('path');
 
 const PORT = 20129;
 const SCRIPT = path.join(__dirname, 'index.js');
-const VERSION = require('./package.json').version || '1.0.0';
+const VERSION = require('./package.json').version || '1.0.1';
 
 // Colors
 const R = '\x1b[0m', G = '\x1b[32m', Y = '\x1b[33m', C = '\x1b[36m', M = '\x1b[35m', B = '\x1b[1m', D = '\x1b[2m';

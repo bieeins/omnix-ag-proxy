@@ -513,7 +513,7 @@
           <span class="pulse-dot"></span>
           <span>ONLINE</span>
         </div>
-        <div class="pill" id="version-pill" onclick="checkUpdatesManual()" style="cursor:pointer;" title="Click to check updates">v1.0.0</div>
+        <div class="pill" id="version-pill" onclick="checkUpdatesManual()" style="cursor:pointer;" title="Click to check updates">v1.0.1</div>
         <div id="update-banner" style="display:none; align-items:center; gap:6px;">
           <span class="pill" style="border-color:rgba(245,158,11,0.4); background:rgba(245,158,11,0.12); color:#fbbf24;">
             ⚡ Update <span id="latest-ver-text">v1.0.1</span>
@@ -924,7 +924,7 @@
         if (data.updateAvailable) {
           showToast('Update available: v' + data.latestVersion);
         } else {
-          showToast('On latest version (v' + (data.currentVersion || '1.0.0') + ')');
+          showToast('On latest version (v' + (data.currentVersion || '1.0.1') + ')');
         }
       } catch (err) {
         showToast('Update check failed: ' + err.message);

@@ -8,7 +8,7 @@ const path = require('path');
 const { EventEmitter } = require('events');
 
 const PKG_VERSION = (() => {
-  try { return require('./package.json').version; } catch (_) { return '1.0.0'; }
+  try { return require('./package.json').version; } catch (_) { return '1.0.1'; }
 })();
 
 // --- Configuration & Persistence ---
