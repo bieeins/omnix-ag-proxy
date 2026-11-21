@@ -148,6 +148,7 @@ function startWindowsTray(port) {
       '-NoProfile', '-WindowStyle', 'Hidden', '-ExecutionPolicy', 'Bypass',
       '-File', trayScript, '-NodePid', process.pid.toString(), '-Port', port.toString()
     ], { detached: true, stdio: 'ignore', windowsHide: true });
+    trayProcess.on('error', () => {});
     trayProcess.unref();
   } catch (_) {}
 }
@@ -155,6 +156,7 @@ function stopWindowsTray() { if (trayProcess) { try { trayProcess.kill(); } catc
 process.on('exit', stopWindowsTray);
 process.on('SIGINT', () => { stopWindowsTray(); process.exit(0); });
 process.on('SIGTERM', () => { stopWindowsTray(); process.exit(0); });
+process.on('uncaughtException', (err) => { console.error('[UNCAUGHT]', err); });
 
 function killProcessOnPort(port) {
   try {
@@ -234,6 +236,30 @@ function printStatus(port) {
   req.on('error', () => { console.log(`OMNIX-SHIELD [STOPPED] on :${port}`); process.exit(1); });
 }
 
+// --- Timezone (Asia/Jakarta / UTC+7) ---
+function getJakartaISO(date = new Date()) {
+  try {
+    return new Intl.DateTimeFormat('sv-SE', {
+      timeZone: 'Asia/Jakarta',
+      year: 'numeric', month: '2-digit', day: '2-digit',
+      hour: '2-digit', minute: '2-digit', second: '2-digit', hour12: false
+    }).format(date).replace(' ', 'T') + '+07:00';
+  } catch (_) {
+    return date.toISOString();
+  }
+}
+
+function getJakartaTime(date = new Date()) {
+  try {
+    return new Intl.DateTimeFormat('en-GB', {
+      timeZone: 'Asia/Jakarta',
+      hour: '2-digit', minute: '2-digit', second: '2-digit', hour12: false
+    }).format(date);
+  } catch (_) {
+    return date.toISOString().slice(11, 19);
+  }
+}
+
 // --- Stats & SSE ---
 const stats = { totalRequests: 0, sanitizedCount: 0, savedTitleCalls: 0, errorCount: 0, startTime: Date.now() };
 const MAX_LOGS = 50;
@@ -265,7 +291,7 @@ function writeLog(text) {
       if (stat.size > LOG_MAX_BYTES) {
         const buf = fs.readFileSync(LOG_FILE, 'utf8');
         const keep = buf.slice(-2 * 1024 * 1024); // keep last 2MB
-        fs.writeFileSync(LOG_FILE, `=== Log rotated ${new Date().toISOString()} (was ${(stat.size/1024/1024).toFixed(1)}MB) ===\n` + keep, 'utf8');
+        fs.writeFileSync(LOG_FILE, `=== Log rotated ${getJakartaISO()} (was ${(stat.size/1024/1024).toFixed(1)}MB) ===\n` + keep, 'utf8');
       }
     } catch (_) {}
     fs.appendFileSync(LOG_FILE, text + '\n', 'utf8');
@@ -645,7 +671,7 @@ const server = http.createServer((req, res) => {
         config.fileLogging = fileLogging;
         saveConfig();
         if (fileLogging) {
-          try { fs.writeFileSync(LOG_FILE, `=== Log started ${new Date().toISOString()} ===\n`); } catch(_) {}
+          try { fs.writeFileSync(LOG_FILE, `=== Log started ${getJakartaISO()} ===\n`); } catch(_) {}
         }
         res.writeHead(200, { 'Content-Type': 'application/json' });
         return res.end(JSON.stringify({ fileLogging }));
@@ -730,15 +756,15 @@ const server = http.createServer((req, res) => {
         res.writeHead(200, { 'Content-Type': 'application/json' });
       }
       res.end(resp);
-      logTraffic({ id: Date.now(), timestamp: new Date().toISOString(), method: req.method, path: req.url, model, status: '200 (LOCAL)', latencyMs: Date.now() - startTime, sanitized: true, snippet: 'Title mocked locally' });
+      logTraffic({ id: Date.now(), timestamp: getJakartaISO(), method: req.method, path: req.url, model, status: '200 (LOCAL)', latencyMs: Date.now() - startTime, sanitized: true, snippet: 'Title mocked locally' });
       return;
     }
 
     const isChatEndpoint = req.url.includes('/chat/completions') || req.url.includes('/messages');
     if (isChatEndpoint) {
-      const ts = new Date().toISOString().slice(11, 19);
+      const ts = getJakartaTime();
       console.log(`[${ts}] POST ${req.url} | model=${model} | tools=${toolCount} | ${changes.join(', ') || 'passthrough'}`);
-      writeLog(`\n[${new Date().toISOString()}] >>> ${req.method} ${req.url}\n${modifiedBody}`);
+      writeLog(`\n[${getJakartaISO()}] >>> ${req.method} ${req.url}\n${modifiedBody}`);
     }
 
     // Forward to upstream with retry
@@ -781,7 +807,7 @@ const server = http.createServer((req, res) => {
           const latMs = Date.now() - startTime;
           const full = Buffer.concat(respChunks).toString('utf8');
           if (isChatEndpoint) {
-            const ts = new Date().toISOString().slice(11, 19);
+            const ts = getJakartaTime();
             console.log(`[${ts}] <- ${status} (${full.length}B, ${latMs}ms)`);
             writeLog(`--- RESPONSE ${status} ---\n${full}`);
           }
@@ -792,7 +818,7 @@ const server = http.createServer((req, res) => {
             try { const e = JSON.parse(full); errorReason = e.error?.message || e.message || ''; } catch (_) { errorReason = full.slice(0, 120); }
           }
 
-          logTraffic({ id: Date.now(), timestamp: new Date().toISOString(), method: req.method, path: req.url, model, toolCount, status, latencyMs: latMs, sanitized: changed, snippet: errorReason || `OK ${full.length}B`, details: { changes, model } });
+          logTraffic({ id: Date.now(), timestamp: getJakartaISO(), method: req.method, path: req.url, model, toolCount, status, latencyMs: latMs, sanitized: changed, snippet: errorReason || `OK ${full.length}B`, details: { changes, model } });
         });
       });
 
@@ -803,7 +829,7 @@ const server = http.createServer((req, res) => {
           res.writeHead(502, { 'Content-Type': 'application/json' });
           res.end(JSON.stringify({ error: { message: `Proxy: ${e.message}`, type: 'proxy_error' } }));
         }
-        logTraffic({ id: Date.now(), timestamp: new Date().toISOString(), method: req.method, path: req.url, model, status: 502, latencyMs: Date.now() - startTime, sanitized: changed, snippet: `Error: ${e.message}` });
+        logTraffic({ id: Date.now(), timestamp: getJakartaISO(), method: req.method, path: req.url, model, status: 502, latencyMs: Date.now() - startTime, sanitized: changed, snippet: `Error: ${e.message}` });
       });
 
       proxyReq.on('timeout', () => {
@@ -834,7 +860,7 @@ if (require.main === module) {
   });
 
   server.listen(config.listenPort, '0.0.0.0', () => {
-    if (fileLogging) try { fs.writeFileSync(LOG_FILE, `=== Log started ${new Date().toISOString()} ===\n`); } catch (_) {}
+    if (fileLogging) try { fs.writeFileSync(LOG_FILE, `=== Log started ${getJakartaISO()} ===\n`); } catch (_) {}
     if (!args.includes('--no-tray') && process.platform === 'win32') startWindowsTray(config.listenPort);
     console.log(`
   OMNIX-SHIELD 

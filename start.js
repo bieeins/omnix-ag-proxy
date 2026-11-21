@@ -43,6 +43,11 @@ function stopExisting() {
     // Wait a moment
     execSync(process.platform === 'win32' ? 'ping -n 2 127.0.0.1 >nul' : 'sleep 1');
   }
+  if (process.platform === 'win32') {
+    try {
+      execSync(`powershell -NoProfile -Command "Get-CimInstance Win32_Process | Where-Object { $_.CommandLine -like '*tray.ps1*' -and $_.CommandLine -like '*${PORT}*' } | Stop-Process -Force -ErrorAction SilentlyContinue"`, { stdio: 'ignore', timeout: 5000 });
+    } catch (_) {}
+  }
 }
 
 function openBrowser(url) {
@@ -73,46 +78,43 @@ function startForeground(openUI) {
 
 function startBackground() {
   stopExisting();
-  const args = ['--port', String(PORT)];
-  const out = require('fs').openSync(path.join(__dirname, 'omnix-shield.log'), 'a');
+  if (process.platform === 'win32') {
+    const vbs = path.join(__dirname, 'start-hidden.vbs');
+    if (require('fs').existsSync(vbs)) {
+      execSync(`wscript //nologo "${vbs}"`, { stdio: 'ignore' });
+      console.log(`\n${G}✓${R} OMNIX-Shield running in background with System Tray Icon`);
+      console.log(`  Dashboard: ${C}http://localhost:${PORT}/ui${R}`);
+      console.log(`  Log file:  ${D}${path.join(__dirname, 'traffic.log')}${R}`);
+      console.log(`\n  Stop: ${Y}node start.js stop${R}`);
+      process.exit(0);
+    }
+  }
+
+  // Non-Windows fallback
+  const args = ['--port', String(PORT), '--no-tray'];
   const child = spawn(process.execPath, [SCRIPT, ...args], {
     detached: true,
-    stdio: ['ignore', out, out],
+    stdio: 'ignore',
     cwd: __dirname,
   });
   child.unref();
   console.log(`\n${G}✓${R} OMNIX-Shield running in background (PID ${child.pid})`);
   console.log(`  Dashboard: ${C}http://localhost:${PORT}/ui${R}`);
-  console.log(`  Log file:  ${D}${path.join(__dirname, 'omnix-shield.log')}${R}`);
-
-  // Launch system tray icon (Windows only)
-  if (process.platform === 'win32') {
-    const trayScript = path.join(__dirname, 'tray.ps1');
-    if (require('fs').existsSync(trayScript)) {
-      execSync(`start /B powershell -ExecutionPolicy Bypass -WindowStyle Hidden -File "${trayScript}" -NodePid ${child.pid} -Port ${PORT}`, { stdio: 'ignore', shell: true });
-      console.log(`  Tray icon: ${G}active${R}`);
-    }
-  }
-
+  console.log(`  Log file:  ${D}${path.join(__dirname, 'traffic.log')}${R}`);
   console.log(`\n  Stop: ${Y}node start.js stop${R}`);
-  setTimeout(() => process.exit(0), 500);
+  process.exit(0);
 }
 
 // CLI shortcuts: node start.js stop / status
 const cmd = process.argv[2];
 if (cmd === 'stop') {
-  const pid = isRunning();
-  if (pid) {
-    try { process.kill(pid); } catch (_) {}
-    console.log(`${G}Stopped${R} OMNIX-Shield (PID ${pid})`);
-  } else {
-    console.log(`${Y}Not running${R}`);
-  }
+  stopExisting();
   process.exit(0);
 }
-if (cmd === 'tray') {
+if (cmd === 'tray' || cmd === 'bg' || cmd === 'background') {
   // Called by autostart shortcut — start background + tray silently
   startBackground();
+  return;
 }
 if (cmd === 'status') {
   const pid = isRunning();
